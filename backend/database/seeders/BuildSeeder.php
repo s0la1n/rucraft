@@ -11,6 +11,6 @@ class BuildSeeder extends Seeder
 {
     public function run(): void
     {
-        
+        $user = User::first();  //автор - первый пользователь
     }
 }

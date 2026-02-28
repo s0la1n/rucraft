@@ -14,6 +14,26 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    protected $fillable = [
+        'name',
+        'login',
+        'email',
+        'password',
+        'role',
+        'is_banned',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'is_banned' => 'boolean',
+    ];
+
     public function builds(): HasMany
     {
         return $this->hasMany(Build::class);
@@ -38,39 +58,4 @@ class User extends Authenticatable
     {
         return $this->hasOne(Developer::class);
     }
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'name',
-        'login',
-        'email',
-        'password',
-        'role',
-        'is_banned',
-    ];
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-        'is_banned' => 'boolean',
-    ];
 }

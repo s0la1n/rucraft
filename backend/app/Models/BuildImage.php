@@ -6,22 +6,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Developer extends Model
+class BuildImage extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 
-        'name', 
-        'role', 
-        'skin', 
-        'bio', 
-        'telegram', 
-        'vk',
+        'build_id',
+        'image_path',
+        'sort_order',
     ];
 
-    public function user(): BelongsTo
+    public function build(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Build::class);
     }
 }
+

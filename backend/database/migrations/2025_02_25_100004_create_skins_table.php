@@ -13,8 +13,10 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('title');
             $table->string('skin_image');
+            $table->string('skin_file');
             $table->string('skin_texture_file');
-            $table->enum('category', ['смешные', 'для девочек', 'для мальчиков', 'аниме']);
+            $table->enum('model', ['Steve', 'Alex']);
+            $table->enum('category', ['Смешные', 'Для девочек', 'Для мальчиков', 'Аниме']);
             $table->text('description')->nullable();
             $table->enum('status', ['process', 'active', 'inactive'])->default('process');
             $table->timestamps();

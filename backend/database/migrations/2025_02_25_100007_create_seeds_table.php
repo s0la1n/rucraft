@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('seed_number');
             $table->enum('version', ['java', 'bedrock', 'java_bedrock'])->default('java');
             $table->string('minecraft_release')->nullable();
-            $table->json('coordinates')->nullable(); // координаты в формате json, напр. [{"x": 100, "y": 64, "z": -200}, ...]
+            $table->json('coordinates')->nullable(); // координаты в формате json, [{"x": 100, "y": 64, "z": -200}, ...]
             $table->string('image')->nullable();
             $table->text('description')->nullable();
             $table->enum('status', ['process', 'active', 'inactive'])->default('process');
