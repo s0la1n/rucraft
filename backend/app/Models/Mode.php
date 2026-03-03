@@ -18,7 +18,8 @@ class Mode extends Model
         'image', 
         'mod_file',
         'version', 
-        'minecraft_version', 'status',
+        'minecraft_version', 
+        'status',
     ];
 
     public function user(): BelongsTo

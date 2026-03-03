@@ -12,8 +12,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('title');
+            $table->string('minecraft_version');
             $table->string('image');
-            $table->string('video_file')->nullable();
+            $table->string('build_file')->nullable();
             $table->text('description')->nullable();
             $table->enum('difficulty', ['легкая', 'обычная', 'сложная'])->default('обычная');
             $table->json('materials')->nullable(); // список материалов для постройки

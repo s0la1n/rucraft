@@ -14,8 +14,9 @@ class Build extends Model
     protected $fillable = [
         'user_id', 
         'title', 
+        'minecraft_version',
         'image', 
-        'video_file', 
+        'build_file', 
         'description',
         'difficulty', 
         'materials', 
