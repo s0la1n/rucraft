@@ -4,6 +4,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { Footer } from "./components/Footer";
 import { Header } from "./components/Header";
 import "./globals.css";
+import "./style.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,13 +28,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-screen antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} site-root`}>
         <AuthProvider>
-          <div className="flex min-h-screen flex-col">
+          <div className="content-area">
             <Header />
-            <main className="flex-1">{children}</main>
+            <main>{children}</main>
             <Footer />
           </div>
         </AuthProvider>

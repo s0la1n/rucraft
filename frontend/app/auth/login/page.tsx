@@ -35,62 +35,26 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="mx-auto max-w-md px-4 py-12">
+    <div className="page-content page-narrow">
       <PageSection title="Вход">
-        <form
-          action={ACTION_LOGIN}
-          method="post"
-          onSubmit={handleSubmit}
-          className="flex flex-col gap-4"
-        >
-          {error && (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">
-              {error}
-            </p>
-          )}
-          <div>
-            <label htmlFor="login" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Логин или почта
-            </label>
-            <input
-              id="login"
-              name="login"
-              type="text"
-              autoComplete="username"
-              required
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
-              placeholder="Логин или email"
-            />
+        <form action={ACTION_LOGIN} method="post" onSubmit={handleSubmit} className="form-stack">
+          {error && <p className="form-error">{error}</p>}
+          <div className="form-group">
+            <label htmlFor="login">Логин или почта</label>
+            <input id="login" name="login" type="text" autoComplete="username" required placeholder="Логин или email" />
           </div>
-          <div>
-            <label htmlFor="password" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Пароль
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
-              placeholder="Пароль"
-            />
+          <div className="form-group">
+            <label htmlFor="password">Пароль</label>
+            <input id="password" name="password" type="password" autoComplete="current-password" required placeholder="Пароль" />
           </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="rounded-lg bg-zinc-900 px-4 py-2 font-medium text-white hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
-          >
+          <button type="submit" disabled={loading} className="btn-submit">
             {loading ? "Вход…" : "Войти"}
           </button>
         </form>
-        <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-500">
-          Нет аккаунта?{" "}
-          <Link href="/auth/register" className="text-emerald-600 hover:underline dark:text-emerald-400">
-            Регистрация
-          </Link>
+        <p className="form-link">
+          Нет аккаунта? <Link href="/auth/register">Регистрация</Link>
         </p>
       </PageSection>
-    </main>
+    </div>
   );
 }

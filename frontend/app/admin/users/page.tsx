@@ -30,26 +30,14 @@ export default function AdminUsersPage() {
   const [actioning, setActioning] = useState<number | null>(null);
 
   useEffect(() => {
-    adminApi
-      .users()
-      .then(setData)
-      .catch(() => setError("Не удалось загрузить список"));
+    adminApi.users().then(setData).catch(() => setError("Не удалось загрузить список"));
   }, []);
 
   async function handleBan(userId: number) {
     setActioning(userId);
     try {
       await adminApi.banUser(userId);
-      setData((prev) =>
-        prev
-          ? {
-              ...prev,
-              data: prev.data.map((u) =>
-                u.id === userId ? { ...u, is_banned: true } : u
-              ),
-            }
-          : null
-      );
+      setData((prev) => (prev ? { ...prev, data: prev.data.map((u) => (u.id === userId ? { ...u, is_banned: true } : u)) } : null));
     } catch {
       setError("Ошибка при бане");
     } finally {
@@ -61,16 +49,7 @@ export default function AdminUsersPage() {
     setActioning(userId);
     try {
       await adminApi.unbanUser(userId);
-      setData((prev) =>
-        prev
-          ? {
-              ...prev,
-              data: prev.data.map((u) =>
-                u.id === userId ? { ...u, is_banned: false } : u
-              ),
-            }
-          : null
-      );
+      setData((prev) => (prev ? { ...prev, data: prev.data.map((u) => (u.id === userId ? { ...u, is_banned: false } : u)) } : null));
     } catch {
       setError("Ошибка при разбане");
     } finally {
@@ -80,81 +59,43 @@ export default function AdminUsersPage() {
 
   return (
     <RequireAuth adminOnly>
-      <main className="mx-auto max-w-4xl px-4 py-8">
-        <Link href="/admin" className="text-sm text-zinc-500 hover:underline">
+      <div className="page-content">
+        <Link href="/admin" className="admin-back">
           ← Админ-панель
         </Link>
         <PageSection title="Пользователи">
-          {error && (
-            <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">
-              {error}
-            </p>
-          )}
+          {error && <p className="form-error">{error}</p>}
           {data && (
-            <div className="overflow-x-auto rounded-lg border border-zinc-200 dark:border-zinc-700">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-zinc-100 dark:bg-zinc-800">
+            <div className="table-wrap">
+              <table className="admin-table">
+                <thead>
                   <tr>
-                    <th className="px-3 py-2">ID</th>
-                    <th className="px-3 py-2">Имя</th>
-                    <th className="px-3 py-2">Логин</th>
-                    <th className="px-3 py-2">Почта</th>
-                    <th className="px-3 py-2">Роль</th>
-                    <th className="px-3 py-2">Статус</th>
-                    <th className="px-3 py-2">Действие</th>
+                    <th>ID</th>
+                    <th>Имя</th>
+                    <th>Логин</th>
+                    <th>Почта</th>
+                    <th>Роль</th>
+                    <th>Статус</th>
+                    <th>Действие</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data.data.map((u) => (
-                    <tr key={u.id} className="border-t border-zinc-200 dark:border-zinc-700">
-                      <td className="px-3 py-2">{u.id}</td>
-                      <td className="px-3 py-2">{u.name}</td>
-                      <td className="px-3 py-2">{u.login}</td>
-                      <td className="px-3 py-2">{u.email}</td>
-                      <td className="px-3 py-2">{u.role}</td>
-                      <td className="px-3 py-2">
+                    <tr key={u.id}>
+                      <td>{u.id}</td>
+                      <td>{u.name}</td>
+                      <td>{u.login}</td>
+                      <td>{u.email}</td>
+                      <td>{u.role}</td>
+                      <td>{u.is_banned ? "Забанен" : "Активен"}</td>
+                      <td>
                         {u.is_banned ? (
-                          <span className="text-red-600 dark:text-red-400">Забанен</span>
-                        ) : (
-                          <span className="text-zinc-500">Активен</span>
-                        )}
-                      </td>
-                      <td className="px-3 py-2">
-                        {u.is_banned ? (
-                          <form
-                            action={`${API_BASE}/admin/users/${u.id}/unban`}
-                            method="post"
-                            onSubmit={(e) => {
-                              e.preventDefault();
-                              handleUnban(u.id);
-                            }}
-                            className="inline"
-                          >
-                            <button
-                              type="submit"
-                              disabled={actioning === u.id}
-                              className="text-emerald-600 hover:underline disabled:opacity-50 dark:text-emerald-400"
-                            >
-                              Разбанить
-                            </button>
+                          <form action={`${API_BASE}/admin/users/${u.id}/unban`} method="post" onSubmit={(e) => { e.preventDefault(); handleUnban(u.id); }} className="form-inline">
+                            <button type="submit" disabled={actioning === u.id} className="btn-unban">Разбанить</button>
                           </form>
                         ) : (
-                          <form
-                            action={`${API_BASE}/admin/users/${u.id}/ban`}
-                            method="post"
-                            onSubmit={(e) => {
-                              e.preventDefault();
-                              handleBan(u.id);
-                            }}
-                            className="inline"
-                          >
-                            <button
-                              type="submit"
-                              disabled={actioning === u.id}
-                              className="text-red-600 hover:underline disabled:opacity-50 dark:text-red-400"
-                            >
-                              Забанить
-                            </button>
+                          <form action={`${API_BASE}/admin/users/${u.id}/ban`} method="post" onSubmit={(e) => { e.preventDefault(); handleBan(u.id); }} className="form-inline">
+                            <button type="submit" disabled={actioning === u.id} className="btn-ban">Забанить</button>
                           </form>
                         )}
                       </td>
@@ -165,7 +106,7 @@ export default function AdminUsersPage() {
             </div>
           )}
         </PageSection>
-      </main>
+      </div>
     </RequireAuth>
   );
 }

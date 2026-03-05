@@ -6,7 +6,8 @@ import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { PageSection } from "../../components/PageSection";
 
-const API_REGISTER = "/api/register";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
+const ACTION_REGISTER = `${API_BASE}/register`;
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -37,107 +38,39 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="mx-auto max-w-md px-4 py-12">
+    <div className="page-content page-narrow">
       <PageSection title="Регистрация">
-        <p className="mb-4 text-sm text-zinc-500 dark:text-zinc-500">
-          Имя, логин, почта, пароль и повтор пароля.
-        </p>
-        <form
-          action={ACTION_REGISTER}
-          method="post"
-          onSubmit={handleSubmit}
-          className="flex flex-col gap-4"
-        >
-          {error && (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">
-              {error}
-            </p>
-          )}
-          <div>
-            <label htmlFor="name" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Имя
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              autoComplete="name"
-              required
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
-              placeholder="Как к вам обращаться"
-            />
+        <p>Имя, логин, почта, пароль и повтор пароля.</p>
+        <form action={ACTION_REGISTER} method="post" onSubmit={handleSubmit} className="form-stack">
+          {error && <p className="form-error">{error}</p>}
+          <div className="form-group">
+            <label htmlFor="name">Имя</label>
+            <input id="name" name="name" type="text" autoComplete="name" required placeholder="Как к вам обращаться" />
           </div>
-          <div>
-            <label htmlFor="login" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Логин (ник)
-            </label>
-            <input
-              id="login"
-              name="login"
-              type="text"
-              autoComplete="username"
-              required
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
-              placeholder="Уникальный логин"
-            />
+          <div className="form-group">
+            <label htmlFor="login">Логин (ник)</label>
+            <input id="login" name="login" type="text" autoComplete="username" required placeholder="Уникальный логин" />
           </div>
-          <div>
-            <label htmlFor="email" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Почта
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
-              placeholder="email@example.com"
-            />
+          <div className="form-group">
+            <label htmlFor="email">Почта</label>
+            <input id="email" name="email" type="email" autoComplete="email" required placeholder="email@example.com" />
           </div>
-          <div>
-            <label htmlFor="password" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Пароль
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              required
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
-              placeholder="Пароль"
-            />
+          <div className="form-group">
+            <label htmlFor="password">Пароль</label>
+            <input id="password" name="password" type="password" autoComplete="new-password" required placeholder="Пароль" />
           </div>
-          <div>
-            <label htmlFor="password_confirmation" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Повтор пароля
-            </label>
-            <input
-              id="password_confirmation"
-              name="password_confirmation"
-              type="password"
-              autoComplete="new-password"
-              required
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
-              placeholder="Повторите пароль"
-            />
+          <div className="form-group">
+            <label htmlFor="password_confirmation">Повтор пароля</label>
+            <input id="password_confirmation" name="password_confirmation" type="password" autoComplete="new-password" required placeholder="Повторите пароль" />
           </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="rounded-lg bg-zinc-900 px-4 py-2 font-medium text-white hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
-          >
+          <button type="submit" disabled={loading} className="btn-submit">
             {loading ? "Регистрация…" : "Зарегистрироваться"}
           </button>
         </form>
-        <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-500">
-          Уже есть аккаунт?{" "}
-          <Link href="/auth/login" className="text-emerald-600 hover:underline dark:text-emerald-400">
-            Вход
-          </Link>
+        <p className="form-link">
+          Уже есть аккаунт? <Link href="/auth/login">Вход</Link>
         </p>
       </PageSection>
-    </main>
+    </div>
   );
 }

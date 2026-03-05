@@ -7,17 +7,15 @@ export const metadata = {
 
 export default function BuildsPage() {
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8">
+    <div className="page-content">
       <PageSection title="Постройки">
-        <p className="text-zinc-600 dark:text-zinc-400">
+        <p>
           Пользователи публикуют постройки: название, фото, список нужных блоков
           и их количество, возможность прикрепить видео. У каждого поста — ник
           автора.
         </p>
-        <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-500">
-          Список построек и форма добавления будут подключены к API.
-        </p>
+        <p>Список построек и форма добавления будут подключены к API.</p>
       </PageSection>
-    </main>
+    </div>
   );
 }

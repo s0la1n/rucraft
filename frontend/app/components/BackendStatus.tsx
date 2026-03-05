@@ -15,21 +15,25 @@ export function BackendStatus() {
 
   if (error) {
     return (
-      <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-red-700 dark:border-red-800 dark:bg-red-950/30 dark:text-red-400">
-        Backend: {error}
-      </p>
+      <div className="backend-status">
+        <p className="status-error">Backend: {error}</p>
+      </div>
     );
   }
 
   if (!data) {
     return (
-      <p className="text-zinc-500 dark:text-zinc-400">Checking backend…</p>
+      <div className="backend-status">
+        <p className="status-loading">Checking backend…</p>
+      </div>
     );
   }
 
   return (
-    <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300">
-      {data.message} (API: {data.timestamp})
-    </p>
+    <div className="backend-status">
+      <p className="status-ok">
+        {data.message} (API: {data.timestamp})
+      </p>
+    </div>
   );
 }

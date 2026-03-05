@@ -15,24 +15,18 @@ const adminTabs = [
 export default function AdminPage() {
   return (
     <RequireAuth adminOnly>
-      <main className="mx-auto max-w-4xl px-4 py-8">
+      <div className="page-content">
         <PageSection title="Админ-панель">
-          <p className="mb-6 text-zinc-600 dark:text-zinc-400">
-            Вкладки по типу контента для модерации постов. Страница «Пользователи» — бан пользователей.
-          </p>
-          <nav className="flex flex-wrap gap-2">
+          <p>Вкладки по типу контента для модерации постов. Страница «Пользователи» — бан пользователей.</p>
+          <nav className="admin-tabs">
             {adminTabs.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-              >
+              <Link key={href} href={href}>
                 {label}
               </Link>
             ))}
           </nav>
         </PageSection>
-      </main>
+      </div>
     </RequireAuth>
   );
 }
