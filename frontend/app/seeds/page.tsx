@@ -1,21 +1,52 @@
+import Link from "next/link";
 import { PageSection } from "../components/PageSection";
+import { seedsApi, type SeedPost } from "@/lib/api";
 
 export const metadata = {
   title: "Сиды — RuCraft",
   description: "Сиды для Minecraft: название, номер сида, версия, релиз, координаты.",
 };
 
-export default function SeedsPage() {
+async function getSeeds(): Promise<SeedPost[]> {
+  const res = await seedsApi.index();
+  return res.data;
+}
+
+export default async function SeedsPage() {
+  const seeds = await getSeeds();
+
   return (
     <div className="page-content">
       <PageSection title="Сиды">
-        <p>
-          Пользователи добавляют сиды: название, номер сида (19 цифр со знаком +
-          или -), версия (Java / Bedrock / оба), релиз (1.0, 1.1, 1.2.1, 1.2.2,
-          1.2.3, 1.2.4 и т.д.) и координаты найденного места (x, z, y со знаком
-          + или -).
-        </p>
-        <p>Список сидов и форма добавления будут подключены к API.</p>
+        {seeds.length === 0 ? (
+          <p>Сидов пока нет.</p>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+            {seeds.map((seed) => (
+              <article key={seed.id} className="card">
+                <div className="card-image">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={seed.image ?? "/placeholder-seed.png"} alt={seed.title} />
+                </div>
+                <div className="card-body">
+                  <h3 className="card-title">{seed.title}</h3>
+                  <p className="card-meta">
+                    Автор: <strong>{seed.author.name}</strong>
+                  </p>
+                  <p className="card-text">
+                    Сид: <code>{seed.seed}</code>
+                  </p>
+                  <p className="card-text">
+                    Версия: {seed.version}, релиз: {seed.release}
+                  </p>
+                  <Link href={`/seeds/${seed.id}`} className="btn-link mt-3 inline-flex">
+                    Подробнее
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
       </PageSection>
     </div>
   );
