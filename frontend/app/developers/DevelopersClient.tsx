@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import "./developers-slider.css";
 
 type Developer = {
   id: number;
@@ -23,6 +24,9 @@ const sliderImages = [
 export function DevelopersClient() {
   const [developers, setDevelopers] = useState<Developer[]>([]);
   const [sliderIndex, setSliderIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [animationDirection, setAnimationDirection] = useState<"left" | "right" | "up" | "down">("right");
+  const [nextSlideIndex, setNextSlideIndex] = useState(0);
 
   useEffect(() => {
     async function loadDevelopers() {
@@ -41,27 +45,62 @@ export function DevelopersClient() {
     loadDevelopers();
   }, []);
 
-  function moveSlider(delta: number) {
+  function moveSlider(delta: number, direction: "left" | "right" | "up" | "down") {
+    if (isAnimating) return;
+    
     const total = sliderImages.length;
     const next = (sliderIndex + delta + total) % total;
-    setSliderIndex(next);
+    
+    setAnimationDirection(direction);
+    setNextSlideIndex(next);
+    setIsAnimating(true);
+    
+    // ожидание окончания анимации 
+    setTimeout(() => {
+      setSliderIndex(next);
+      setIsAnimating(false);
+    }, 1500);
   }
 
   function sliderButtons() {
     return (
-      <div>
-        <button type="button" onClick={() => moveSlider(-1)}>
-          ←
-        </button>
-        <button type="button" onClick={() => moveSlider(1)}>
-          →
-        </button>
-        <button type="button" onClick={() => moveSlider(-1)}>
-          ↑
-        </button>
-        <button type="button" onClick={() => moveSlider(1)}>
-          ↓
-        </button>
+      <div className="slider-controls">
+        <div className="slider-nav-row">
+          <button 
+            type="button" 
+            onClick={() => moveSlider(-1, "left")}
+            disabled={isAnimating}
+            className="slider-nav-btn"
+          >
+            ←
+          </button>
+          <button 
+            type="button" 
+            onClick={() => moveSlider(1, "right")}
+            disabled={isAnimating}
+            className="slider-nav-btn"
+          >
+            →
+          </button>
+        </div>
+        <div className="slider-nav-row">
+          <button 
+            type="button" 
+            onClick={() => moveSlider(-1, "up")}
+            disabled={isAnimating}
+            className="slider-nav-btn"
+          >
+            ↑
+          </button>
+          <button 
+            type="button" 
+            onClick={() => moveSlider(1, "down")}
+            disabled={isAnimating}
+            className="slider-nav-btn"
+          >
+            ↓
+          </button>
+        </div>
       </div>
     );
   }
@@ -70,61 +109,93 @@ export function DevelopersClient() {
     <main>
       <h1>Разработчики</h1>
 
-      <section>
-        <h2>Слайдер</h2>
+      <section className="slider-section">
         {sliderButtons()}
-        <div>
-          <img
-            src={`/images/${sliderImages[sliderIndex]}`}
-            alt="Слайд разработчиков"
-          />
+        
+        <div className="slider-container">
+          {/* Текущий слайд с анимацией */}
+          <div className={`slide-wrapper ${isAnimating ? `animate-${animationDirection}` : ''}`}>
+            <img
+              src={`/images/${sliderImages[sliderIndex]}`}
+              alt="Слайд разработчиков"
+              className="slide-image"
+            />
+            
+            {/* элементы для анимации складывания */}
+            {isAnimating && (
+              <>
+                <div className="fold-corner top-left"></div>
+                <div className="fold-corner top-right"></div>
+                <div className="fold-corner bottom-left"></div>
+                <div className="fold-corner bottom-right"></div>
+                <div className="paper-plane">
+                  <div className="plane-body"></div>
+                  <div className="plane-wing"></div>
+                  <div className="plane-tail"></div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* превью следующего слайда (показывается во время анимации) */}
+          {isAnimating && (
+            <div className="next-slide-preview">
+              <img
+                src={`/images/${sliderImages[nextSlideIndex]}`}
+                alt="Следующий слайд"
+                className="slide-image preview"
+              />
+            </div>
+          )}
         </div>
-        <p>Текущий слайд: {sliderIndex + 1}</p>
       </section>
 
-      <section>
+      <section className="developers-section">
         {developers.length === 0 && <p>Разработчики пока не добавлены.</p>}
 
         {developers.map((developer) => (
-          <article key={developer.id}>
-            <h3>{developer.name}</h3>
-            <p>{developer.role}</p>
-            {developer.bio && <p>{developer.bio}</p>}
-
-            {(developer.telegram || developer.vk) && (
-              <div>
-                {developer.telegram && (
-                  <div>
-                    Telegram:{" "}
-                    <a
-                      href={`https://t.me/${developer.telegram.replace(/^@/, "")}`}
-                    >
-                      {developer.telegram}
-                    </a>
-                  </div>
-                )}
-                {developer.vk && (
-                  <div>
-                    VK:{" "}
-                    <a
-                      href={`https://vk.com/${developer.vk.replace(/^@/, "")}`}
-                    >
-                      {developer.vk}
-                    </a>
-                  </div>
-                )}
-              </div>
-            )}
-
+          <article key={developer.id} className="developer-card">
             {developer.skin_url && (
-              <div>
+              <div className="developer-skin">
                 <img src={developer.skin_url} alt={`Скин ${developer.name}`} />
               </div>
             )}
+            
+            <div className="developer-info">
+              <h3>{developer.name}</h3>
+              <p className="developer-role">{developer.role}</p>
+              {developer.bio && <p className="developer-bio">{developer.bio}</p>}
+
+              {(developer.telegram || developer.vk) && (
+                <div className="developer-social">
+                  {developer.telegram && (
+                    <div className="social-link">
+                      <a
+                        href={`https://t.me/${developer.telegram.replace(/^@/, "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Telegram: {developer.telegram}
+                      </a>
+                    </div>
+                  )}
+                  {developer.vk && (
+                    <div className="social-link">
+                      <a
+                        href={`https://vk.com/${developer.vk.replace(/^@/, "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        VK: {developer.vk}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </article>
         ))}
       </section>
     </main>
   );
 }
-
