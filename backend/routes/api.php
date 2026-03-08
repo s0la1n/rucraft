@@ -4,6 +4,10 @@ use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\DeveloperController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\BuildController;
+use App\Http\Controllers\Api\ModeController;
+use App\Http\Controllers\Api\SeedController;
+use App\Http\Controllers\Api\SkinController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +20,19 @@ Route::get('/ping', function () {
 });
 
 Route::get('/developers', [DeveloperController::class, 'index']);
+
+// Публичные списки и страницы с подробной информацией
+Route::get('/builds', [BuildController::class, 'index']);
+Route::get('/builds/{build}', [BuildController::class, 'show']);
+
+Route::get('/mods', [ModeController::class, 'index']);
+Route::get('/mods/{mode}', [ModeController::class, 'show']);
+
+Route::get('/seeds', [SeedController::class, 'index']);
+Route::get('/seeds/{seed}', [SeedController::class, 'show']);
+
+Route::get('/skins', [SkinController::class, 'index']);
+Route::get('/skins/{skin}', [SkinController::class, 'show']);
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);

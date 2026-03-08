@@ -98,6 +98,8 @@ export const authApi = {
     }),
 };
 
+// ——— Profile ———
+
 export const profileApi = {
   show: () =>
     apiFetch<UserResponse>("profile", { token: getToken() }),
@@ -139,4 +141,96 @@ export const adminApi = {
       method: "POST",
       token: getToken(),
     }),
+};
+
+// ——— Content: builds / mods / seeds / skins ———
+
+export type ContentAuthor = {
+  id: number;
+  name: string;
+};
+
+export type ListItemBase = {
+  id: number;
+  title: string;
+  image?: string | null;
+  created_at: string;
+  author: ContentAuthor;
+};
+
+export type BuildBlock = {
+  name: string;
+  count: number;
+};
+
+export type BuildPost = {
+  id: number;
+  title: string;
+  image?: string | null;
+  description?: string | null;
+  images: string[];
+  blocks: BuildBlock[];
+  video_url?: string | null;
+  author: ContentAuthor;
+  created_at: string;
+};
+
+export type ModPost = {
+  id: number;
+  title: string;
+  image?: string | null;
+  description?: string | null;
+  images: string[];
+  file_url: string;
+  author: ContentAuthor;
+  created_at: string;
+};
+
+export type SeedPost = {
+  id: number;
+  title: string;
+  image?: string | null;
+  seed: string;
+  version: "java" | "bedrock" | "both";
+  release: string;
+  x: number;
+  y: number;
+  z: number;
+  author: ContentAuthor;
+  created_at: string;
+};
+
+export type SkinPost = {
+  id: number;
+  title: string;
+  image?: string | null;
+  category: "funny" | "girls" | "boys" | "anime";
+  image_url: string;
+  file_url: string;
+  author: ContentAuthor;
+  created_at: string;
+};
+
+export type ShowResponse<T> = {
+  data: T;
+};
+
+export const buildsApi = {
+  index: () => apiFetch<{ data: BuildPost[] }>("builds"),
+  show: (id: number) => apiFetch<ShowResponse<BuildPost>>(`builds/${id}`),
+};
+
+export const modsApi = {
+  index: () => apiFetch<{ data: ModPost[] }>("mods"),
+  show: (id: number) => apiFetch<ShowResponse<ModPost>>(`mods/${id}`),
+};
+
+export const seedsApi = {
+  index: () => apiFetch<{ data: SeedPost[] }>("seeds"),
+  show: (id: number) => apiFetch<ShowResponse<SeedPost>>(`seeds/${id}`),
+};
+
+export const skinsApi = {
+  index: () => apiFetch<{ data: SkinPost[] }>("skins"),
+  show: (id: number) => apiFetch<ShowResponse<SkinPost>>(`skins/${id}`),
 };
