@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { PageSection } from "../../components/PageSection";
-import { modsApi, type ModPost } from "@/lib/api";
+import { modsApi, type ModPost, resolveAssetUrl } from "@/lib/api";
 
 export default function ModShowPage() {
   const params = useParams<{ id: string }>();
@@ -48,17 +48,20 @@ export default function ModShowPage() {
             {mod.description && <p>{mod.description}</p>}
             {mod.images?.length > 0 && (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {mod.images.map((src) => (
-                  <div key={src} className="overflow-hidden rounded-xl bg-zinc-200 dark:bg-zinc-700">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={src} alt={mod.title} className="h-full w-full object-cover" />
-                  </div>
-                ))}
+                {mod.images.map((src) => {
+                  const resolved = resolveAssetUrl(src) ?? src;
+                  return (
+                    <div key={src} className="overflow-hidden rounded-xl bg-zinc-200 dark:bg-zinc-700">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={resolved} alt={mod.title} className="h-full w-full object-cover" />
+                    </div>
+                  );
+                })}
               </div>
             )}
             <p>
               Файл:{" "}
-              <a href={mod.file_url} className="link" target="_blank" rel="noopener noreferrer">
+              <a href={resolveAssetUrl(mod.file_url) ?? mod.file_url} className="link" target="_blank" rel="noopener noreferrer">
                 скачать архив
               </a>
             </p>

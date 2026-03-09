@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { PageSection } from "../../components/PageSection";
-import { skinsApi, type SkinPost } from "@/lib/api";
+import { skinsApi, type SkinPost, resolveAssetUrl } from "@/lib/api";
 
 export default function SkinShowPage() {
   const params = useParams<{ id: string }>();
@@ -47,14 +47,14 @@ export default function SkinShowPage() {
             </p>
             <div className="overflow-hidden rounded-xl bg-zinc-200 dark:bg-zinc-700 max-w-xs">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={skin.image_url} alt={skin.title} className="h-full w-full object-cover" />
+              <img src={resolveAssetUrl(skin.image_url) ?? skin.image_url} alt={skin.title} className="h-full w-full object-cover" />
             </div>
             <p>
               Категория: <strong>{skin.category}</strong>
             </p>
             <p>
               Файл развёртки:{" "}
-              <a href={skin.file_url} className="link" target="_blank" rel="noopener noreferrer">
+              <a href={resolveAssetUrl(skin.file_url) ?? skin.file_url} className="link" target="_blank" rel="noopener noreferrer">
                 скачать
               </a>
             </p>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PageSection } from "../components/PageSection";
-import { seedsApi, type SeedPost } from "@/lib/api";
+import { seedsApi, type SeedPost, resolveAssetUrl } from "@/lib/api";
 
 export const metadata = {
   title: "Сиды — RuCraft",
@@ -35,12 +35,17 @@ export default async function SeedsPage() {
           <p>Сидов пока нет.</p>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-            {seeds.map((seed) => (
-              <article key={seed.id} className="card">
-                <div className="card-image">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={seed.image ?? "/placeholder-seed.png"} alt={seed.title} />
-                </div>
+            {seeds.map((seed) => {
+              const imageSrc =
+                seed.image_url ??
+                resolveAssetUrl(seed.image) ??
+                "/placeholder-seed.png";
+              return (
+                <article key={seed.id} className="card">
+                  <div className="card-image">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={imageSrc} alt={seed.title} />
+                  </div>
                 <div className="card-body">
                   <h3 className="card-title">{seed.title}</h3>
                   <p className="card-meta">
@@ -52,12 +57,13 @@ export default async function SeedsPage() {
                   <p className="card-text">
                     Версия: {seed.version}, релиз: {seed.release}
                   </p>
-                  <Link href={`/seeds/${seed.id}`} className="btn-link mt-3 inline-flex">
-                    Подробнее
-                  </Link>
-                </div>
-              </article>
-            ))}
+                    <Link href={`/seeds/${seed.id}`} className="btn-link mt-3 inline-flex">
+                      Подробнее
+                    </Link>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         )}
       </PageSection>

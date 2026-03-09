@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PageSection } from "../components/PageSection";
-import { modsApi, type ModPost } from "@/lib/api";
+import { modsApi, type ModPost, resolveAssetUrl } from "@/lib/api";
 
 export const metadata = {
   title: "Моды — RuCraft",
@@ -35,24 +35,30 @@ export default async function ModsPage() {
           <p>Модов пока нет.</p>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-            {mods.map((mod) => (
-              <article key={mod.id} className="card">
-                <div className="card-image">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={mod.image ?? "/placeholder-mod.png"} alt={mod.title} />
-                </div>
+            {mods.map((mod) => {
+              const imageSrc =
+                mod.image_url ??
+                resolveAssetUrl(mod.image) ??
+                "/placeholder-mod.png";
+              return (
+                <article key={mod.id} className="card">
+                  <div className="card-image">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={imageSrc} alt={mod.title} />
+                  </div>
                 <div className="card-body">
                   <h3 className="card-title">{mod.title}</h3>
                   <p className="card-meta">
                     Автор: <strong>{mod.author.name}</strong>
                   </p>
                   {mod.description && <p className="card-text line-clamp-3">{mod.description}</p>}
-                  <Link href={`/mods/${mod.id}`} className="btn-link mt-3 inline-flex">
-                    Подробнее
-                  </Link>
-                </div>
-              </article>
-            ))}
+                    <Link href={`/mods/${mod.id}`} className="btn-link mt-3 inline-flex">
+                      Подробнее
+                    </Link>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         )}
       </PageSection>

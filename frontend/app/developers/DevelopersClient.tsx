@@ -116,7 +116,7 @@ export function DevelopersClient() {
           {/* Текущий слайд с анимацией */}
           <div className={`slide-wrapper ${isAnimating ? `animate-${animationDirection}` : ''}`}>
             <img
-              src={`/images/${sliderImages[sliderIndex]}`}
+              src={`http://localhost:8000/storage/${sliderImages[sliderIndex]}`}
               alt="Слайд разработчиков"
               className="slide-image"
             />
@@ -141,7 +141,7 @@ export function DevelopersClient() {
           {isAnimating && (
             <div className="next-slide-preview">
               <img
-                src={`/images/${sliderImages[nextSlideIndex]}`}
+                src={`http://localhost:8000/storage/${sliderImages[nextSlideIndex]}`}
                 alt="Следующий слайд"
                 className="slide-image preview"
               />

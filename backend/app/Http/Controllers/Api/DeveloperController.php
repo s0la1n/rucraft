@@ -24,7 +24,7 @@ class DeveloperController extends Controller
                     'telegram' => $developer->telegram,
                     'vk' => $developer->vk,
                     'skin_url' => $skin
-                        ? '/images/developers/' . $skin
+                        ? asset('storage/developers/' . $skin)
                         : null,
                 ];
             });

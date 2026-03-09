@@ -1,6 +1,24 @@
 const getBaseUrl = () =>
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
 
+export const getBackendBaseUrl = () => {
+  const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
+  // Обрезаем суффикс /api, чтобы получить базовый URL бэкенда для статики
+  return apiBase.replace(/\/api\/?$/, "");
+};
+
+export const resolveAssetUrl = (path?: string | null): string | null => {
+  if (!path) return null;
+  // Если уже полный URL — возвращаем как есть
+  if (/^(?:https?:)?\/\//.test(path)) return path;
+
+  const backendBase = getBackendBaseUrl().replace(/\/$/, "");
+  const raw = path.replace(/^\/+/, "");
+  const withStoragePrefix = raw.startsWith("storage/") ? raw : `storage/${raw}`;
+  const normalizedPath = `/${withStoragePrefix}`;
+  return `${backendBase}${normalizedPath}`;
+};
+
 export type ApiError = { message: string; errors?: Record<string, string[]> };
 
 function getToken(): string | null {
@@ -167,6 +185,7 @@ export type BuildPost = {
   id: number;
   title: string;
   image?: string | null;
+  image_url?: string | null;
   description?: string | null;
   images: string[];
   blocks: BuildBlock[];
@@ -179,6 +198,7 @@ export type ModPost = {
   id: number;
   title: string;
   image?: string | null;
+  image_url?: string | null;
   description?: string | null;
   images: string[];
   file_url: string;
@@ -190,6 +210,7 @@ export type SeedPost = {
   id: number;
   title: string;
   image?: string | null;
+  image_url?: string | null;
   seed: string;
   version: "java" | "bedrock" | "both";
   release: string;
