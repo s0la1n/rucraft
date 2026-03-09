@@ -24,6 +24,7 @@ Route::get('/developers', [DeveloperController::class, 'index']);
 // Публичные списки и страницы с подробной информацией
 Route::get('/builds', [BuildController::class, 'index']);
 Route::get('/builds/{build}', [BuildController::class, 'show']);
+Route::get('/builds/{build}/download', [BuildController::class, 'downloadFile']);
 
 Route::get('/mods', [ModeController::class, 'index']);
 Route::get('/mods/{mode}', [ModeController::class, 'show']);
@@ -33,7 +34,6 @@ Route::get('/seeds', [SeedController::class, 'index']);
 Route::get('/seeds/{seed}', [SeedController::class, 'show']);
 
 Route::get('/skins', [SkinController::class, 'index']);
-Route::get('/skins/{skin}', [SkinController::class, 'show']);
 Route::get('/skins/{skin}/download', [SkinController::class, 'downloadTexture']);
 
 Route::post('/register', [AuthController::class, 'register']);

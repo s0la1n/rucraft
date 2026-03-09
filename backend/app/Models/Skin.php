@@ -14,8 +14,6 @@ class Skin extends Model
     protected $fillable = [
         'user_id', 
         'title', 
-        'skin_image', 
-        'skin_file',
         'skin_texture_file',
         'model',
         'category', 

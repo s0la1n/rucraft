@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { PageSection } from "../../components/PageSection";
-import { buildsApi, type BuildPost, resolveAssetUrl } from "@/lib/api";
+import { buildsApi, type BuildPost, resolveAssetUrl, getBaseUrl } from "@/lib/api";
 
 export default function BuildShowPage() {
   const params = useParams<{ id: string }>();
@@ -71,10 +71,14 @@ export default function BuildShowPage() {
                 </ul>
               </div>
             )}
-            {build.video_url && (
+            {build.file_url && (
               <div className="mt-4">
-                <a href={build.video_url} className="link" target="_blank" rel="noopener noreferrer">
-                  Смотреть видео
+                <a
+                  href={`${getBaseUrl().replace(/\/$/, "")}/builds/${build.id}/download`}
+                  className="btn-primary inline-flex"
+                  download
+                >
+                  скачать
                 </a>
               </div>
             )}

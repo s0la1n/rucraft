@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
 
@@ -13,43 +14,59 @@ const nav = [
 
 export function Header() {
   const { user, loading, logout } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <header className="site-header">
       <div className="site-header-inner">
-        <Link href="/" className="site-logo" aria-label="RuCraft — на главную">
+        <Link href="/" className="site-logo" aria-label="RuCraft — на главную" onClick={() => setMenuOpen(false)}>
           RuCraft
         </Link>
-        <nav className="site-nav">
-          {nav.map(({ href, label }) => (
-            <Link key={href} href={href}>
-              {label}
-            </Link>
-          ))}
-        </nav>
-        <div className="site-header-actions">
-          {loading ? (
-            <span>...</span>
-          ) : user ? (
-            <>
-              <Link href="/profile">Профиль</Link>
-              {user.role === "admin" && (
-                <Link href="/admin">Админ</Link>
-              )}
-              <button type="button" onClick={() => logout()}>
-                Выход
-              </button>
-            </>
-          ) : (
-            <>
-              <Link href="/auth/login" className="btn-auth">
-                Войти
+
+        <button
+          type="button"
+          className="site-nav-toggle"
+          onClick={() => setMenuOpen((v) => !v)}
+          aria-expanded={menuOpen}
+          aria-label={menuOpen ? "Закрыть меню" : "Открыть меню"}
+        >
+          <span className="site-nav-toggle-bar" />
+          <span className="site-nav-toggle-bar" />
+          <span className="site-nav-toggle-bar" />
+        </button>
+
+        <div className={`site-nav-wrap ${menuOpen ? "open" : ""}`}>
+          <nav className="site-nav">
+            {nav.map(({ href, label }) => (
+              <Link key={href} href={href} onClick={() => setMenuOpen(false)}>
+                {label}
               </Link>
-              <Link href="/auth/register" className="btn-auth btn-register">
-                Зарегистрироваться
-              </Link>
-            </>
-          )}
+            ))}
+          </nav>
+          <div className="site-header-actions">
+            {loading ? (
+              <span>...</span>
+            ) : user ? (
+              <>
+                <Link href="/profile" onClick={() => setMenuOpen(false)}>Профиль</Link>
+                {user.role === "admin" && (
+                  <Link href="/admin" onClick={() => setMenuOpen(false)}>Админ</Link>
+                )}
+                <button type="button" onClick={() => { setMenuOpen(false); logout(); }}>
+                  Выход
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/login" className="btn-auth" onClick={() => setMenuOpen(false)}>
+                  Войти
+                </Link>
+                <Link href="/auth/register" className="btn-auth btn-register" onClick={() => setMenuOpen(false)}>
+                  Зарегистрироваться
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </header>

@@ -75,9 +75,8 @@ export default function ModShowPage() {
               Файл:{" "}
               <a
                 href={`${getBaseUrl().replace(/\/$/, "")}/mods/${mod.id}/download`}
-                className="link"
-                target="_blank"
-                rel="noopener noreferrer"
+                className="btn-primary inline-flex"
+                download
               >
                 скачать архив
               </a>

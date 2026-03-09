@@ -20,7 +20,7 @@ class SkinController extends Controller
                     'id' => $skin->id,
                     'title' => $skin->title,
                     'category' => $skin->category,
-                    'image' => $skin->skin_image,
+                    'file_url' => $skin->skin_texture_file,
                     'author' => [
                         'id' => $skin->user?->id,
                         'name' => $skin->user?->name ?? 'Неизвестный автор',
@@ -31,26 +31,6 @@ class SkinController extends Controller
 
         return response()->json([
             'data' => $skins,
-        ]);
-    }
-
-    public function show(Skin $skin): JsonResponse
-    {
-        $skin->load(['user']);
-
-        return response()->json([
-            'data' => [
-                'id' => $skin->id,
-                'title' => $skin->title,
-                'category' => $skin->category,
-                'image' => $skin->skin_image,
-                'file_url' => $skin->skin_texture_file,
-                'author' => [
-                    'id' => $skin->user?->id,
-                    'name' => $skin->user?->name ?? 'Неизвестный автор',
-                ],
-                'created_at' => $skin->created_at?->toIso8601String(),
-            ],
         ]);
     }
 

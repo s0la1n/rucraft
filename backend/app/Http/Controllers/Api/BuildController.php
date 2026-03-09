@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Build;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 
 class BuildController extends Controller
 {
@@ -51,7 +52,7 @@ class BuildController extends Controller
                         'count' => (int) ($item['count'] ?? 0),
                     ];
                 })->values(),
-                'video_url' => $build->build_file,
+                'file_url' => $build->build_file,
                 'author' => [
                     'id' => $build->user?->id,
                     'name' => $build->user?->name ?? 'Неизвестный автор',
@@ -59,6 +60,19 @@ class BuildController extends Controller
                 'created_at' => $build->created_at?->toIso8601String(),
             ],
         ]);
+    }
+
+    public function downloadFile(Build $build)
+    {
+        $path = $build->build_file;
+
+        if (!$path || !Storage::disk('public')->exists($path)) {
+            abort(404);
+        }
+
+        $filename = basename($path);
+
+        return Storage::disk('public')->download($path, $filename);
     }
 }
 
