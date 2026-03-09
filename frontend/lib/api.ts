@@ -222,6 +222,8 @@ export type SeedPost = {
   created_at: string;
 };
 
+export type SkinCategory = "Смешные" | "Для девочек" | "Для мальчиков" | "Аниме";
+
 export type SkinPost = {
   id: number;
   title: string;
@@ -231,6 +233,14 @@ export type SkinPost = {
   file_url?: string | null;
   author: ContentAuthor;
   created_at: string;
+};
+
+export type SkinsIndexResponse = {
+  data: SkinPost[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
 };
 
 export type ShowResponse<T> = {
@@ -252,6 +262,33 @@ export const seedsApi = {
   show: (id: number) => apiFetch<ShowResponse<SeedPost>>(`seeds/${id}`),
 };
 
+export type CreateSkinResponse = {
+  message: string;
+  data: { id: number; title: string; category: string; image_url: string; file_url: string };
+};
+
 export const skinsApi = {
-  index: () => apiFetch<{ data: SkinPost[] }>("skins"),
+  index: (params?: { page?: number; category?: string }) => {
+    const q = new URLSearchParams();
+    if (params?.page) q.set("page", String(params.page));
+    if (params?.category) q.set("category", params.category);
+    const query = q.toString();
+    return apiFetch<SkinsIndexResponse>(`skins${query ? `?${query}` : ""}`);
+  },
+  show: (id: number) => apiFetch<ShowResponse<SkinPost>>(`skins/${id}`),
+  create: (formData: FormData) =>
+    fetch(`${(process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api").replace(/\/$/, "")}/skins`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        ...(typeof window !== "undefined" && localStorage.getItem("rucraft_token")
+          ? { Authorization: `Bearer ${localStorage.getItem("rucraft_token")}` }
+          : {}),
+      },
+      body: formData,
+    }).then(async (res) => {
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message ?? `${res.status} ${res.statusText}`);
+      return data as CreateSkinResponse;
+    }),
 };

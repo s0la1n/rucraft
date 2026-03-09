@@ -12,22 +12,51 @@ const apiErrorMessage = (
   </p>
 );
 
-async function getSkins(): Promise<{ data: SkinPost[]; error?: boolean }> {
+async function getSkins(params: {
+  page?: number;
+  category?: string;
+}): Promise<
+  | { data: SkinPost[]; current_page: number; last_page: number; total: number; error?: false }
+  | { data: []; error: true }
+> {
   try {
-    const res = await skinsApi.index();
-    return { data: res.data };
+    const res = await skinsApi.index({
+      page: params.page ?? 1,
+      category: params.category || undefined,
+    });
+    return {
+      data: res.data,
+      current_page: res.current_page,
+      last_page: res.last_page,
+      total: res.total,
+    };
   } catch (err) {
     console.error("Skins fetch failed:", err);
-    return { data: [], error: true };
+    return { data: [], error: true as const };
   }
 }
 
-export default async function SkinsPage() {
-  const { data: skins, error: fetchFailed } = await getSkins();
+export default async function SkinsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; category?: string }>;
+}) {
+  const params = await searchParams;
+  const page = Math.max(1, parseInt(String(params?.page ?? "1"), 10) || 1);
+  const category = params?.category ?? "";
+
+  const result = await getSkins({ page, category: category || undefined });
+  const fetchFailed = "error" in result && result.error;
+  const skins = result.data;
+  const currentPage = fetchFailed ? 1 : result.current_page;
+  const lastPage = fetchFailed ? 1 : result.last_page;
+  const total = fetchFailed ? 0 : result.total;
 
   return (
     <div className="page-content">
       <PageSection title="Скины">
+        <SkinsToolbar />
+
         {fetchFailed ? (
           apiErrorMessage
         ) : skins.length === 0 ? (
