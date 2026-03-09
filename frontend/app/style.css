@@ -39,10 +39,52 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
-  gap: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
-/* Логотип: 314×87.3, клик — переход на главную */
+/* Кнопка бургер-меню — скрыта на десктопе */
+.site-nav-toggle {
+  display: none;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 6px;
+}
+
+.site-nav-toggle:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+.site-nav-toggle-bar {
+  display: block;
+  width: 24px;
+  height: 3px;
+  background: currentColor;
+  border-radius: 2px;
+}
+
+/* Обёртка навигации и кнопок — на мобильных выезжает по клику */
+.site-nav-wrap {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-end;
+  max-width: 100%;
+}
+
+/* Логотип: 314×87.3 на больших экранах */
 .site-logo {
   display: flex;
   align-items: center;
@@ -66,12 +108,13 @@
   object-fit: contain;
 }
 
-/* Навигация: белый текст, 26px */
+/* Навигация: белый текст, 26px; при нехватке места пункты переносятся, не перекрывая лого */
 .site-nav {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .site-nav a {
@@ -86,12 +129,119 @@
   opacity: 0.9;
 }
 
-/* Кнопки Войти/Регистрация: выходят за контент вправо на 30px */
+/* Кнопки Войти/Регистрация */
 .site-header-actions {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-right: -30px;
+  flex-shrink: 0;
+}
+
+/* Планшеты: уменьшаем логотип и шрифт навигации */
+@media (max-width: 1200px) {
+  .site-logo {
+    width: 200px;
+    height: 56px;
+    font-size: 1.25rem;
+  }
+
+  .site-nav a {
+    font-size: 18px;
+    padding: 6px 10px;
+  }
+
+  .btn-auth {
+    font-size: 24px;
+    height: 44px;
+    padding: 0 16px;
+  }
+
+  .site-header-actions {
+    margin-right: 0;
+  }
+}
+
+/* Планшеты узкие: навигация в одну строку, ещё компактнее */
+@media (max-width: 1024px) {
+  .site-logo {
+    width: 160px;
+    height: 48px;
+    font-size: 1.125rem;
+  }
+
+  .site-nav a {
+    font-size: 16px;
+    padding: 6px 8px;
+  }
+}
+
+/* Мобильные: бургер-меню */
+@media (max-width: 900px) {
+  .site-header-inner {
+    min-height: 64px;
+    padding: 8px 16px;
+  }
+
+  .site-nav-toggle {
+    display: flex;
+    order: 2;
+  }
+
+  .site-logo {
+    width: 140px;
+    height: 44px;
+    font-size: 1.125rem;
+    order: 1;
+  }
+
+  .site-nav-wrap {
+    display: none;
+    order: 3;
+    flex-basis: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px 0;
+    gap: 12px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    margin-top: 0;
+  }
+
+  .site-nav-wrap.open {
+    display: flex;
+  }
+
+  .site-nav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  .site-nav a {
+    font-size: 18px;
+    padding: 12px 16px;
+    display: block;
+  }
+
+  .site-header-actions {
+    flex-direction: column;
+    margin-right: 0;
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .site-header-actions a,
+  .site-header-actions button {
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+  }
+
+  .btn-auth {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .site-header-actions a:not(.btn-auth),
