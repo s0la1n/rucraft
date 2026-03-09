@@ -879,6 +879,323 @@
   color: #262626;
 }
 
+/* ——— Страница списка скинов: тулбар, карточки, пагинация ——— */
+.skins-list-page {
+  padding: 0 16px 32px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.skins-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.skins-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skins-filter-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.skins-filter-btn:hover,
+.skins-filter-btn.active {
+  background: rgba(255,255,255,0.35);
+  border-color: rgba(255,255,255,0.5);
+}
+
+.skins-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.skins-action-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: #FBFF00;
+  color: #0800FF;
+  border: 4px solid #0800FF;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.skins-action-btn:hover {
+  opacity: 0.95;
+}
+
+.skins-grid-page {
+  display: grid;
+  grid-template-columns: repeat(4, 305px);
+  gap: 24px;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 1320px) {
+  .skins-grid-page { grid-template-columns: repeat(2, 305px); }
+}
+
+@media (max-width: 680px) {
+  .skins-grid-page { grid-template-columns: 1fr; }
+}
+
+.skin-card-page {
+  width: 305px;
+  height: 440px;
+  background: #fff;
+  border: 6px solid #FF0000;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.skin-card-page .skin-card-image-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+}
+
+.skin-card-page .skin-card-image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.skin-card-page .skin-card-name {
+  font-size: 30px;
+  color: #000;
+  text-align: center;
+  padding: 8px;
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.skin-card-page .skin-card-category {
+  font-size: 0.95rem;
+  color: #333;
+  text-align: center;
+  padding: 0 8px 8px;
+  margin: 0;
+}
+
+.skin-card-page .skin-card-footer {
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.skin-card-download {
+  width: 259px;
+  height: 54px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #FBFF00;
+  border: 4px solid #0800FF;
+  color: #0800FF;
+  font-size: 32px;
+  font-weight: 700;
+  text-decoration: none;
+  font-family: inherit;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.skin-card-download:hover {
+  opacity: 0.95;
+}
+
+.skins-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.skins-pagination a,
+.skins-pagination span {
+  padding: 8px 14px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.skins-pagination a:hover {
+  background: rgba(255,255,255,0.35);
+}
+
+.skins-pagination .current {
+  background: rgba(255,255,255,0.4);
+  border-color: rgba(255,255,255,0.6);
+}
+
+/* Модальное окно добавления скина */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal-content {
+  background: #22B14C;
+  border-radius: 12px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  border: 2px solid rgba(255,255,255,0.2);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #fff;
+}
+
+.modal-close {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  border-radius: 8px;
+  line-height: 1;
+  padding: 0;
+}
+
+.modal-close:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-body .form-error {
+  color: #ff6b6b;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+.modal-body .form-group {
+  margin-bottom: 16px;
+}
+
+.modal-body .form-group label {
+  display: block;
+  margin-bottom: 6px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.modal-body .form-group input[type="text"],
+.modal-body .form-group input[type="file"],
+.modal-body .form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 2px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.modal-body .form-group input::file-selector-button {
+  margin-right: 8px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  cursor: pointer;
+}
+
+.modal-body .form-hint {
+  margin: 6px 0 0;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.8);
+}
+
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 16px;
+  margin-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+.modal-footer .btn-secondary {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 2px solid rgba(255,255,255,0.4);
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.modal-footer .btn-submit {
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: #FBFF00;
+  color: #0800FF;
+  border: 4px solid #0800FF;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.modal-footer .btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .seed-screenshot {
   margin-top: 40px;
   max-width: 48rem;

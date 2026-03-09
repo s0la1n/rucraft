@@ -252,7 +252,36 @@ export const seedsApi = {
   show: (id: number) => apiFetch<ShowResponse<SeedPost>>(`seeds/${id}`),
 };
 
+export type SkinsIndexResponse = {
+  data: SkinPost[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+};
+
+export type CreateSkinResponse = { message: string; data: { id: number; title: string; category: string } };
+
 export const skinsApi = {
-  index: () => apiFetch<{ data: SkinPost[] }>("skins"),
+  index: (params?: { page?: number; category?: string }) => {
+    const q = new URLSearchParams();
+    if (params?.page) q.set("page", String(params.page));
+    if (params?.category) q.set("category", params.category);
+    const query = q.toString();
+    return apiFetch<SkinsIndexResponse>(`skins${query ? `?${query}` : ""}`);
+  },
   show: (id: number) => apiFetch<ShowResponse<SkinPost>>(`skins/${id}`),
+  create: (formData: FormData) => {
+    const base = getBaseUrl().replace(/\/$/, "");
+    const token = typeof window !== "undefined" ? localStorage.getItem("rucraft_token") : null;
+    return fetch(`${base}/skins`, {
+      method: "POST",
+      headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: formData,
+    }).then(async (res) => {
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error((data as { message?: string }).message ?? String(res.status));
+      return data as CreateSkinResponse;
+    });
+  },
 };
