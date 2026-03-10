@@ -148,7 +148,7 @@ export default async function Home() {
                   <div className="seeds-slide-name">{firstSeed.title}</div>
                 </div>
                 <div className="seeds-more-wrap">
-                  <Link href={`/seeds/${firstSeed.id}`} className="builds-more-btn">
+                  <Link href={`/seeds`} className="builds-more-btn">
                     БОЛЬШЕ &gt;&gt;&gt;
                   </Link>
                 </div>
