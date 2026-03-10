@@ -19,6 +19,8 @@ const sliderImages = [
   "developers/разработчики_слайдер3.png",
   "developers/разработчики_слайдер4.png",
   "developers/разработчики_слайдер5.png",
+  "developers/разработчики_слайдер6.png",
+  "developers/разработчики_слайдер7.png",
 ];
 
 export default function DevelopersPage() {
