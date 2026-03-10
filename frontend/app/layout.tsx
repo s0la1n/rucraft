@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Comic_Relief} from 'next/font/google'
 import { AuthProvider } from "./context/AuthContext";
 import { Footer } from "./components/Footer";
 import { Header } from "./components/Header";
 import "./globals.css";
+
+const comicRelief = Comic_Relief({
+  weight: ["400", "700"],
+  variable: "--font-comic-relief",
+  subsets: ["latin", "cyrillic"],
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

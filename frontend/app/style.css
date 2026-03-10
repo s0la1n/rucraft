@@ -1389,6 +1389,16 @@
   margin-bottom: 16px;
 }
 
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.form-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
 .form-group label {
   display: block;
   font-size: 0.875rem;
@@ -1468,6 +1478,116 @@
 
 .status-loading {
   color: #737373;
+}
+
+/* Minesweeper Captcha */
+.captcha-container {
+  margin: 20px 0;
+  padding: 20px;
+  background: #f0f0f0;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.captcha-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 8px;
+}
+
+.captcha-hint {
+  font-size: 0.875rem;
+  color: #525252;
+  margin-bottom: 16px;
+}
+
+.minesweeper-board {
+  display: grid;
+  grid-template-columns: repeat(5, 50px);
+  gap: 2px;
+  background: #999;
+  padding: 10px;
+  border-radius: 5px;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.minesweeper-cell {
+  width: 50px;
+  height: 50px;
+  border: 2px solid;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.minesweeper-cell.revealed {
+  cursor: default;
+}
+
+.minesweeper-cell:active:not(:disabled) {
+  border-color: #666 #fff #fff #666;
+}
+
+.minesweeper-cell:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.captcha-status {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 12px 0;
+}
+
+.captcha-status.won {
+  color: #16a34a;
+}
+
+.captcha-status.lost {
+  color: #dc2626;
+}
+
+.captcha-insult {
+  color: #dc2626;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin: 12px 0;
+  padding: 8px 12px;
+  background: #fef2f2;
+  border-radius: 6px;
+}
+
+.captcha-success {
+  color: #16a34a;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 12px 0;
+}
+
+.captcha-retry-btn {
+  padding: 10px 20px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.captcha-retry-btn:hover:not(:disabled) {
+  background: #45a049;
+}
+
+.captcha-retry-btn:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
 }
 
 /* Анимация слайдера */
