@@ -15,7 +15,7 @@ const comicRelief = Comic_Relief({
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin", "cyrillic"],
-});
+}); 
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",

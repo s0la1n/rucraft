@@ -48,11 +48,27 @@
   box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.1);
 }
 
+.formGroup select {
+  padding: 5%;
+  border: 1px solid #ffffff;
+  transition: all 0.2s ease;
+  background-color: #fff;
+  font-family: "Comic Relief", system-ui;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.formGroup select:focus {
+  outline: none;
+  border: 5px solid rgb(255, 0, 191);
+  box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.1);
+}
+
 .formRow {
-  display: grid;
-  align-items: center;
-  grid-template-columns: 1fr 1fr;  /* два столбца равной ширины\\                       /* отступ между колонками */
-  width: 100%;                       /* занимает всю ширину */
+  display: flex;
+  gap: 1rem;
+  justify-content: center;          /* центрируем колонки */
+  width: 70%;
 }
 
 /* Для ошибок */
@@ -69,17 +85,13 @@
 /* Для кнопки */
 .btnSubmit {
   width: 100%;
-  padding: 1rem;
-  background: linear-gradient(135deg, aqua, #00b8b8);
+  padding: 5%;
+  background: #00DF7B;
   color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 15pt;
+  
   cursor: pointer;
   transition: all 0.2s ease;
-  text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
 .btnSubmit:hover:not(:disabled) {
@@ -100,7 +112,7 @@
   width: 100%;
 }
 
-.formGroup label {
+.formGroup label, .btnSubmit {
     font-family: "Comic Relief", system-ui;
     font-weight: 700;
 }

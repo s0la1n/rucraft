@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { PageSection } from "../../components/PageSection";
+import { MinesweeperCaptcha } from "../../components/MinesweeperCaptcha";
 import styles from './register.module.css';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
@@ -15,10 +16,17 @@ export default function RegisterPage() {
   const { register: doRegister } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [captchaPassed, setCaptchaPassed] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+
+    if (!captchaPassed) {
+      setError("Сначала пройдите капчу-сапёр!");
+      return;
+    }
+
     setLoading(true);
     const form = e.currentTarget;
     const fd = new FormData(form);
@@ -27,7 +35,7 @@ export default function RegisterPage() {
     const email = (fd.get("email") as string)?.trim() ?? "";
     const password = (fd.get("password") as string) ?? "";
     const password_confirmation = (fd.get("password_confirmation") as string) ?? "";
-    
+
     try {
       await doRegister({ name, login, email, password, password_confirmation });
       router.replace("/");
@@ -96,16 +104,29 @@ export default function RegisterPage() {
           
           <div className={styles.formGroup}>
             <label htmlFor="password_confirmation">Повтор пароля</label>
-            <input 
-              id="password_confirmation" 
-              name="password_confirmation" 
-              type="password" 
-              autoComplete="new-password" 
-              required 
-              placeholder="Повторите пароль" 
+            <input
+              id="password_confirmation"
+              name="password_confirmation"
+              type="password"
+              autoComplete="new-password"
+              required
+              placeholder="Повторите пароль"
             />
           </div>
-          
+
+          <div className={styles.formGroup}>
+            <label htmlFor="gender">Пол</label>
+            <select
+              id="gender"
+              name="gender"
+              defaultValue="Женщина"
+              className={styles.formSelect}
+            >
+              <option value="Женщина">Женщина</option>
+              <option value="Ошибка человечества">Ошибка человечества</option>
+            </select>
+          </div>
+
           <div className={styles.formGroup}>
             <label htmlFor="card_number">Номер карты</label>
             <input
@@ -143,9 +164,11 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <button 
-            type="submit" 
-            disabled={loading} 
+          <MinesweeperCaptcha onVerify={setCaptchaPassed} />
+
+          <button
+            type="submit"
+            disabled={loading || !captchaPassed}
             className={styles.btnSubmit}
           >
             {loading ? "Регистрация…" : "зАРЕГИСТРИРОВАТЬСЯ"}
