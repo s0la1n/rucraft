@@ -2,21 +2,35 @@ export const getBaseUrl = () =>
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
 
 export const getBackendBaseUrl = () => {
-  const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
-  // Обрезаем суффикс /api, чтобы получить базовый URL бэкенда для статики
-  return apiBase.replace(/\/api\/?$/, "");
+  const apiBase = getBaseUrl(); // Используем уже готовую функцию
+  // Безопасно заменяем, гарантируя, что работаем со строкой
+  return String(apiBase).replace(/\/api\/?$/, "");
 };
 
 export const resolveAssetUrl = (path?: string | null): string | null => {
-  if (!path) return null;
-  // Если уже полный URL — возвращаем как есть
-  if (/^(?:https?:)?\/\//.test(path)) return path;
+  if (!path || typeof path !== 'string') return null;
+
+  const cleanPath = path.trim();
+  if (!cleanPath || cleanPath === "null") return null;
+
+  // Если это уже полный URL
+  if (/^(?:https?:)?\/\//.test(cleanPath)) return cleanPath;
 
   const backendBase = getBackendBaseUrl().replace(/\/$/, "");
-  const raw = path.replace(/^\/+/, "");
-  const withStoragePrefix = raw.startsWith("storage/") ? raw : `storage/${raw}`;
-  const normalizedPath = `/${withStoragePrefix}`;
-  return `${backendBase}${normalizedPath}`;
+  
+  // Убираем ведущие слеши
+  let raw = cleanPath.replace(/^\/+/, "");
+  
+  // Если путь НЕ начинается с 'storage/', добавляем его
+  // Но в вашем сидере 'skins/...' -> должно стать 'storage/skins/...'
+  if (!raw.startsWith("storage/")) {
+    raw = `storage/${raw}`;
+  }
+
+  // ОБЯЗАТЕЛЬНО: кодируем кириллицу (для "бобер_пират.png")
+  const encodedPath = raw.split('/').map(segment => encodeURIComponent(segment)).join('/');
+
+  return `${backendBase}/${encodedPath}`;
 };
 
 export type ApiError = { message: string; errors?: Record<string, string[]> };
@@ -231,6 +245,7 @@ export type SkinPost = {
   file_url?: string | null;
   author: ContentAuthor;
   created_at: string;
+  skin_texture_file?: string | null;
 };
 
 export type ShowResponse<T> = {

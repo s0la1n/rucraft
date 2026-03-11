@@ -29,10 +29,14 @@ function buildDownloadUrl(skinId: number): string {
   return `${base}/api/skins/${skinId}/download`;
 }
 
-export default async function SkinsPage(props: { searchParams?: Promise<{ page?: string; category?: string }> | { page?: string; category?: string } }) {
-  const raw = props.searchParams;
-  const searchParams = typeof raw?.then === "function" ? await raw : (raw ?? {});
-  const page = Math.max(1, parseInt(String(searchParams.page || "1"), 10) || 1);
+export default async function SkinsPage(props: { 
+  searchParams: Promise<{ page?: string; category?: string }> 
+}) {
+  // 2. Просто ждем промис. Next.js сам передаст его.
+  const searchParams = await props.searchParams;
+  
+  // 3. Достаем значения (теперь TypeScript знает, что это обычный объект)
+  const page = Math.max(1, parseInt(searchParams.page || "1", 10) || 1);
   const category = searchParams.category ?? "";
 
   const result = await getSkins({ page, category: category || undefined });
@@ -54,19 +58,20 @@ export default async function SkinsPage(props: { searchParams?: Promise<{ page?:
             <>
               <div className="skins-grid-page">
                 {skins.map((skin) => {
-                  const imageSrc =
-                    resolveAssetUrl(skin.file_url ?? skin.image ?? undefined) ?? "/placeholder-skin.png";
-                  const downloadUrl = buildDownloadUrl(skin.id);
+                  const imageSrc = resolveAssetUrl(skin.file_url) ?? "/placeholder-skin.png";
+                  const downloadUrl = `${getBackendBaseUrl().replace(/\/$/, "")}/api/skins/${skin.id}/download`;
 
                   return (
                     <article key={skin.id} className="skin-card-page">
                       <div className="skin-card-image-wrap">
+                        {/* Если imageSrc === null, наш новый Skin3DViewer не упадет */}
                         <Skin3DViewer skinUrl={imageSrc} title={skin.title} className="skin-card-canvas" />
                       </div>
                       <h3 className="skin-card-name">{skin.title}</h3>
                       <p className="skin-card-category">{skin.category}</p>
                       <div className="skin-card-footer">
-                        <a href={downloadUrl} className="skin-card-download" download>
+                        {/* Используем target="_blank" чтобы избежать блокировок CORS при скачивании */}
+                        <a href={downloadUrl} className="skin-card-download" target="_blank" rel="noopener noreferrer">
                           Скачать
                         </a>
                       </div>
