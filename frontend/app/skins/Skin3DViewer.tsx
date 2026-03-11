@@ -1,4 +1,4 @@
-\"use client\";
+ "use client";
 
 import { useEffect, useRef } from "react";
 
@@ -49,22 +49,21 @@ export function Skin3DViewer({ skinUrl, title, className }: Skin3DViewerProps) {
           viewer.animation = new mod.WalkingAnimation();
         }
       } catch (e) {
-        // If skinview3d fails for some reason, we silently ignore to avoid breaking the page
-        console.error(\"Failed to initialize skinview3d\", e);
+        console.error("Failed to initialize skinview3d", e);
       }
     })();
 
     return () => {
       disposed = true;
       try {
-        if (viewer && typeof viewer.dispose === \"function\") {
+        if (viewer && typeof viewer.dispose === "function") {
           viewer.dispose();
         }
       } catch {
         // ignore
       }
       if (containerRef.current) {
-        containerRef.current.innerHTML = \"\";
+        containerRef.current.innerHTML = "";
       }
     };
   }, [skinUrl]);
