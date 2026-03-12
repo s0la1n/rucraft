@@ -11,10 +11,10 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "skinview3d": "^3.4.1",
     "next": "16.1.6",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "skinview3d": "^3.4.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

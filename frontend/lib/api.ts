@@ -8,29 +8,33 @@ export const getBackendBaseUrl = () => {
 };
 
 export const resolveAssetUrl = (path?: string | null): string | null => {
-  if (!path || typeof path !== 'string') return null;
-
+  // Безопасная проверка
+  if (path === null || path === undefined) {
+    console.log('[resolveAssetUrl] Path is null or undefined');
+    return null;
+  }
+  
+  if (typeof path !== 'string') {
+    console.log('[resolveAssetUrl] Path is not a string:', typeof path);
+    return null;
+  }
+  
   const cleanPath = path.trim();
-  if (!cleanPath || cleanPath === "null") return null;
-
-  // Если это уже полный URL
-  if (/^(?:https?:)?\/\//.test(cleanPath)) return cleanPath;
-
-  const backendBase = getBackendBaseUrl().replace(/\/$/, "");
-  
-  // Убираем ведущие слеши
-  let raw = cleanPath.replace(/^\/+/, "");
-  
-  // Если путь НЕ начинается с 'storage/', добавляем его
-  // Но в вашем сидере 'skins/...' -> должно стать 'storage/skins/...'
-  if (!raw.startsWith("storage/")) {
-    raw = `storage/${raw}`;
+  if (!cleanPath || cleanPath === "null" || cleanPath === "undefined") {
+    console.log('[resolveAssetUrl] Empty or invalid path');
+    return null;
   }
 
-  // ОБЯЗАТЕЛЬНО: кодируем кириллицу (для "бобер_пират.png")
-  const encodedPath = raw.split('/').map(segment => encodeURIComponent(segment)).join('/');
+  // Если это уже полный URL с другим доменом
+  if (/^(?:https?:)?\/\//.test(cleanPath) && !cleanPath.includes('localhost:8000')) {
+    return cleanPath;
+  }
 
-  return `${backendBase}/${encodedPath}`;
+  // Извлекаем имя файла из пути
+  const filename = cleanPath.split('/').pop() || '';
+  
+  // Используем прокси маршрут
+  return `/skin-image/${encodeURIComponent(filename)}`;
 };
 
 export type ApiError = { message: string; errors?: Record<string, string[]> };

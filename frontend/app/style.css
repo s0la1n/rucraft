@@ -1778,3 +1778,223 @@
     height: 41px;
   }
 }
+
+
+/* ========================================
+   SKINVIEW3D — 3D ПРОСМОТРЩИК СКИНОВ
+   ======================================== */
+
+.skin-card-canvas {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.skin-card-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Скелетон загрузки для 3D-вьювера */
+.skin-card-canvas-loading {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1) 25%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.1) 75%
+  );
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s infinite;
+}
+
+/* Адаптация для мобильных устройств */
+@media (max-width: 768px) {
+  .skin-card-canvas canvas {
+    image-rendering: auto;
+  }
+}
+
+/* Обновляем стили для карточки скина */
+.skin-card-page .skin-card-image-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  overflow: hidden;
+}
+
+/* Стили для страницы отдельного скина (если есть) */
+.skin-detail-3d-viewer {
+  width: 100%;
+  max-width: 600px;
+  height: 600px;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #141e30 0%, #243b55 100%);
+}
+
+.skin-detail-3d-viewer canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Анимация загрузки */
+@keyframes loading-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Добавьте в ваш CSS файл */
+
+.skins-stats {
+  text-align: center;
+  color: #fff;
+  margin-bottom: 20px;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.skins-pagination {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.pagination-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pagination-first,
+.pagination-last,
+.pagination-prev,
+.pagination-next,
+.pagination-page {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.pagination-page {
+  min-width: 40px;
+  font-weight: 500;
+}
+
+.pagination-page.active {
+  background: #FBFF00;
+  color: #0800FF;
+  border-color: #0800FF;
+  font-weight: 700;
+}
+
+.pagination-first:hover,
+.pagination-last:hover,
+.pagination-prev:hover,
+.pagination-next:hover,
+.pagination-page:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pagination-ellipsis {
+  color: #fff;
+  padding: 0 5px;
+  font-size: 16px;
+  opacity: 0.7;
+}
+
+.pagination-info {
+  color: #fff;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.skins-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #fff;
+}
+
+.skins-empty-hint {
+  margin-top: 10px;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* Адаптив для мобильных */
+@media (max-width: 768px) {
+  .pagination-container {
+    gap: 4px;
+  }
+  
+  .pagination-page {
+    min-width: 35px;
+    height: 35px;
+    font-size: 14px;
+  }
+  
+  .pagination-first,
+  .pagination-last,
+  .pagination-prev,
+  .pagination-next {
+    min-width: 35px;
+    height: 35px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pagination-pages {
+    order: 2;
+    width: 100%;
+    margin-top: 10px;
+  }
+  
+  .pagination-container {
+    flex-wrap: wrap;
+  }
+}
