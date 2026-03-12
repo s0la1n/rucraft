@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 "use client";
 
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent, type WheelEvent as ReactWheelEvent } from "react";
 
 type BiomeId =
   | "ocean"
@@ -177,6 +177,8 @@ type HoverInfo = {
 
 export function SeedMap() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  
   const [seedInput, setSeedInput] = useState<string>("1058938605076983349");
   const [seed, setSeed] = useState<number>(1058938605);
   const [platform, setPlatform] = useState<Platform>("bedrock");
@@ -187,8 +189,11 @@ export function SeedMap() {
   const [hover, setHover] = useState<HoverInfo>(null);
   const [structures, setStructures] = useState<StructureMarker[]>([]);
   const [selectedStructure, setSelectedStructure] = useState<StructureMarker | null>(null);
-
-  const mapContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Состояния для перетаскивания
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [dragCenter, setDragCenter] = useState({ x: centerX, z: centerZ });
 
   const applySeed = () => {
     const trimmed = seedInput.trim();
@@ -208,6 +213,196 @@ export function SeedMap() {
     }
 
     setSeed(numericSeed);
+  };
+
+  // Функция для преобразования экранных координат в мировые
+  const screenToWorld = (screenX: number, screenY: number, currentCenterX: number, currentCenterZ: number, currentZoom: number) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { worldX: 0, worldZ: 0 };
+
+    const width = canvas.width;
+    const height = canvas.height;
+    const blocksPerPixel = 8 / currentZoom;
+    const halfWidthBlocks = (width * blocksPerPixel) / 2;
+    const halfHeightBlocks = (height * blocksPerPixel) / 2;
+
+    const startX = currentCenterX - halfWidthBlocks;
+    const startZ = currentCenterZ - halfHeightBlocks;
+
+    const worldX = startX + screenX * blocksPerPixel;
+    const worldZ = startZ + screenY * blocksPerPixel;
+
+    return { worldX, worldZ };
+  };
+
+  // Колесико мыши: зум + запрет прокрутки страницы (не глобально, а только внутри карты)
+  useEffect(() => {
+    const container = mapContainerRef.current;
+    if (!container) return;
+
+    const onWheel = (e: globalThis.WheelEvent) => {
+      // Блокируем прокрутку страницы, когда колесо крутят над картой
+      e.preventDefault();
+      e.stopPropagation();
+
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      // если колесо крутят по контейнеру, но не над самим канвасом — ничего не делаем
+      if (mouseX < 0 || mouseX > rect.width || mouseY < 0 || mouseY > rect.height) return;
+
+      // Переводим в координаты "буфера" канваса (на случай scale в CSS)
+      const sx = (mouseX / rect.width) * canvas.width;
+      const sy = (mouseY / rect.height) * canvas.height;
+
+      const delta = e.deltaY > 0 ? -0.15 : 0.15;
+
+      const { worldX: worldXBefore, worldZ: worldZBefore } = screenToWorld(
+        sx,
+        sy,
+        centerX,
+        centerZ,
+        zoom
+      );
+
+      const newZoom = Math.max(0.25, Math.min(8, zoom * (1 + delta)));
+
+      const { worldX: worldXAfter, worldZ: worldZAfter } = screenToWorld(
+        sx,
+        sy,
+        centerX,
+        centerZ,
+        newZoom
+      );
+
+      setCenterX((prev) => prev + (worldXBefore - worldXAfter));
+      setCenterZ((prev) => prev + (worldZBefore - worldZAfter));
+      setZoom(newZoom);
+    };
+
+    container.addEventListener("wheel", onWheel, { passive: false });
+    return () => container.removeEventListener("wheel", onWheel as EventListener);
+  }, [centerX, centerZ, zoom]);
+
+  // Обработчики для перетаскивания
+  const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
+    if (e.button !== 0) return; // Только левая кнопка мыши
+    
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setIsDragging(true);
+    setDragStart({ x: e.clientX, y: e.clientY });
+    setDragCenter({ x: centerX, z: centerZ });
+  };
+
+  const handleMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+
+    if (isDragging) {
+      // Перетаскивание карты
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const blocksPerPixel = 8 / zoom;
+      
+      const dx = (dragStart.x - e.clientX) * blocksPerPixel;
+      const dy = (dragStart.y - e.clientY) * blocksPerPixel;
+      
+      // Обновляем центр карты
+      const newCenterX = dragCenter.x + dx;
+      const newCenterZ = dragCenter.z + dy;
+      
+      setCenterX(newCenterX);
+      setCenterZ(newCenterZ);
+      
+      // Обновляем dragCenter для следующего шага, чтобы движение было плавным
+      setDragCenter({ x: newCenterX, z: newCenterZ });
+      setDragStart({ x: e.clientX, y: e.clientY });
+    } else {
+      // Обновление информации при наведении
+      const width = canvas.width;
+      const height = canvas.height;
+      const seedBase = mixSeed(seed, platform, versionId);
+      const blocksPerPixel = 8 / zoom;
+      const halfWidthBlocks = (width * blocksPerPixel) / 2;
+      const halfHeightBlocks = (height * blocksPerPixel) / 2;
+
+      const startX = centerX - halfWidthBlocks;
+      const startZ = centerZ - halfHeightBlocks;
+
+      const worldX = Math.floor(startX + px * blocksPerPixel);
+      const worldZ = Math.floor(startZ + py * blocksPerPixel);
+
+      const biome = pickBiome(seedBase, worldX, worldZ);
+      const chunkX = Math.floor(worldX / 16);
+      const chunkZ = Math.floor(worldZ / 16);
+
+      setHover({
+        worldX,
+        worldZ,
+        chunkX,
+        chunkZ,
+        biome,
+      });
+    }
+  };
+
+  const handleMouseUp = (e: MouseEvent<HTMLCanvasElement>) => {
+    if (isDragging) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setIsDragging(false);
+  };
+
+  const handleMouseLeave = (e: MouseEvent<HTMLCanvasElement>) => {
+    if (isDragging) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setHover(null);
+    setIsDragging(false);
+  };
+
+  const handleClick = (e: MouseEvent<HTMLCanvasElement>) => {
+    // Не обрабатываем клик, если было перетаскивание
+    if (isDragging) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+
+    let closest: StructureMarker | null = null;
+    let closestDist = Infinity;
+
+    for (const s of structures) {
+      const dx = s.screenX - px;
+      const dy = s.screenY - py;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 6 && dist < closestDist) {
+        closest = s;
+        closestDist = dist;
+      }
+    }
+
+    setSelectedStructure(closest);
   };
 
   useEffect(() => {
@@ -261,15 +456,20 @@ export function SeedMap() {
 
     // Генерация структур
     const newStructures: StructureMarker[] = [];
-    const chunkStep = 16 * 8;
+
+    const gridStep = 8;
 
     const startChunkX = Math.floor((startX - 64) / 16);
     const endChunkX = Math.ceil((endX + 64) / 16);
     const startChunkZ = Math.floor((startZ - 64) / 16);
     const endChunkZ = Math.ceil((endZ + 64) / 16);
 
-    for (let chunkX = startChunkX; chunkX <= endChunkX; chunkX += 8) {
-      for (let chunkZ = startChunkZ; chunkZ <= endChunkZ; chunkZ += 8) {
+    // Выровняем сетку по кратным gridStep, чтобы метки не «прыгали» при небольшом сдвиге
+    const firstGridChunkX = Math.floor(startChunkX / gridStep) * gridStep;
+    const firstGridChunkZ = Math.floor(startChunkZ / gridStep) * gridStep;
+
+    for (let chunkX = firstGridChunkX; chunkX <= endChunkX; chunkX += gridStep) {
+      for (let chunkZ = firstGridChunkZ; chunkZ <= endChunkZ; chunkZ += gridStep) {
         const noise = hashToUnit(seedBase + 12345, chunkX, chunkZ);
 
         let type: StructureType | null = null;
@@ -307,70 +507,6 @@ export function SeedMap() {
 
     setStructures(newStructures);
   }, [seed, platform, versionId, centerX, centerZ, zoom]);
-  
-  const handleMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const px = e.clientX - rect.left;
-    const py = e.clientY - rect.top;
-
-    const width = canvas.width;
-    const height = canvas.height;
-
-    const seedBase = mixSeed(seed, platform, versionId);
-
-    const blocksPerPixel = 8 / zoom;
-    const halfWidthBlocks = (width * blocksPerPixel) / 2;
-    const halfHeightBlocks = (height * blocksPerPixel) / 2;
-
-    const startX = centerX - halfWidthBlocks;
-    const startZ = centerZ - halfHeightBlocks;
-
-    const worldX = Math.floor(startX + px * blocksPerPixel);
-    const worldZ = Math.floor(startZ + py * blocksPerPixel);
-
-    const biome = pickBiome(seedBase, worldX, worldZ);
-    const chunkX = Math.floor(worldX / 16);
-    const chunkZ = Math.floor(worldZ / 16);
-
-    setHover({
-      worldX,
-      worldZ,
-      chunkX,
-      chunkZ,
-      biome,
-    });
-  };
-
-  const handleMouseLeave = () => {
-    setHover(null);
-  };
-
-  const handleClick = (e: MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const px = e.clientX - rect.left;
-    const py = e.clientY - rect.top;
-
-    let closest: StructureMarker | null = null;
-    let closestDist = Infinity;
-
-    for (const s of structures) {
-      const dx = s.screenX - px;
-      const dy = s.screenY - py;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 6 && dist < closestDist) {
-        closest = s;
-        closestDist = dist;
-      }
-    }
-
-    setSelectedStructure(closest);
-  };
 
   const pan = (dx: number, dz: number) => {
     const step = 128 / zoom;
@@ -378,8 +514,15 @@ export function SeedMap() {
     setCenterZ((prev) => prev + dz * step);
   };
 
-  const zoomIn = () => setZoom((z) => Math.min(8, z * 1.5));
-  const zoomOut = () => setZoom((z) => Math.max(0.25, z / 1.5));
+  const zoomIn = () => {
+    const newZoom = Math.min(8, zoom * 1.5);
+    setZoom(newZoom);
+  };
+  
+  const zoomOut = () => {
+    const newZoom = Math.max(0.25, zoom / 1.5);
+    setZoom(newZoom);
+  };
 
   const visibleVersions = VERSIONS.filter((v) => v.platform === platform);
 
@@ -456,28 +599,28 @@ export function SeedMap() {
           <span>Смещение:</span>
           <button
             type="button"
-            onClick={() => pan(0, -1)}
+            onClick={() => pan(0, -3)}
             className="inline-flex h-7 w-7 items-center justify-center rounded border border-gray-600 bg-black/40"
           >
             ↑
           </button>
           <button
             type="button"
-            onClick={() => pan(-1, 0)}
+            onClick={() => pan(-3, 0)}
             className="inline-flex h-7 w-7 items-center justify-center rounded border border-gray-600 bg-black/40"
           >
             ←
           </button>
           <button
             type="button"
-            onClick={() => pan(1, 0)}
+            onClick={() => pan(3, 0)}
             className="inline-flex h-7 w-7 items-center justify-center rounded border border-gray-600 bg-black/40"
           >
             →
           </button>
           <button
             type="button"
-            onClick={() => pan(0, 1)}
+            onClick={() => pan(0, 3)}
             className="inline-flex h-7 w-7 items-center justify-center rounded border border-gray-600 bg-black/40"
           >
             ↓
@@ -489,25 +632,35 @@ export function SeedMap() {
       <div 
         ref={mapContainerRef}
         className="relative inline-block overflow-hidden rounded-lg border border-gray-700 bg-black"
-        style={{ position: 'relative' }} // Явно указываем relative
+        style={{ 
+          position: 'relative',
+          margin: '0 auto',
+          width: '800px',
+        }}
       >
-        {/* Канвас - без позиционирования, просто блок */}
+        {/* Канвас с обработчиками событий */}
         <canvas
           ref={canvasRef}
           width={800}
           height={600}
-          className="block"
+          className="block cursor-grab active:cursor-grabbing select-none"
           style={{ 
             display: 'block',
             width: '800px',
-            height: '600px'
+            height: '600px',
+            userSelect: 'none', // Предотвращаем выделение текста при перетаскивании
+            WebkitUserSelect: 'none',
+            MozUserSelect: 'none',
+            msUserSelect: 'none'
           }}
+          onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseLeave}
           onClick={handleClick}
         />
 
-        {/* Слой с метками - явно позиционируем относительно контейнера */}
+        {/* Слой с метками */}
         <div 
           style={{ 
             position: 'absolute',
@@ -537,17 +690,20 @@ export function SeedMap() {
                 border: 'none',
                 padding: 0,
               }}
-              onClick={() => setSelectedStructure(s)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedStructure(s);
+              }}
             >
               <img
                 src={STRUCTURE_ICONS[s.type]}
                 alt={STRUCTURE_LABELS[s.type]}
                 style={{
                   width: '100%',
-                  height: '100%',
                   filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))',
                 }}
                 className="hover:scale-110 transition-transform"
+                draggable={false} // Предотвращаем перетаскивание изображения
               />
             </button>
           ))}
@@ -567,8 +723,9 @@ export function SeedMap() {
             flexDirection: 'column',
             justifyContent: 'space-between',
             fontSize: '10px',
-            color: '#ccc',
-            padding: '4px 8px'
+            color: '#000',
+            padding: '4px 8px',
+            textShadow: '0 0 3px rgba(255,255,255,0.5)' // Добавляем тень для лучшей читаемости
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -640,6 +797,7 @@ export function SeedMap() {
                     src={STRUCTURE_ICONS[id]}
                     alt={STRUCTURE_LABELS[id]}
                     className="h-3 w-3"
+                    draggable={false}
                   />
                   <span>{STRUCTURE_LABELS[id]}</span>
                 </div>
@@ -651,4 +809,3 @@ export function SeedMap() {
     </div>
   );
 }
-
