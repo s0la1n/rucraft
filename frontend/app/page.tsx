@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BackendStatus } from "./components/BackendStatus";
 import { HeroSlider } from "./components/HeroSlider";
+import { Skin3DViewer } from "./skins/Skin3DViewer";
 import {
   buildsApi,
   modsApi,
@@ -46,10 +47,10 @@ export default async function Home() {
 
   return (
     <>
+      {/* HeroSlider с исправленными кнопками */}
       <HeroSlider />
 
-  
-      {/* Блок Постройки: данные из BuildSeeder */}
+      {/* Блок Постройки */}
       <section className="builds-block">
         <h2 className="builds-title">ПОСТРОЙКИ</h2>
         <div className="builds-gallery">
@@ -86,7 +87,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Блок cRbys: первые 4 скина */}
+      {/* Блок cRbys */}
       <section className="skins-block">
         <h2 className="section-title-cyan">cRbys</h2>
         <div className="skins-cards-row">
@@ -94,18 +95,30 @@ export default async function Home() {
             <p className="form-error">Скины пока не загружены.</p>
           ) : (
             skins.map((skin) => {
-              const imageSrc = resolveAssetUrl(skin.image) ?? "/placeholder-skin.png";
+              const imageSrc = skin.file_url ?? "/placeholder-skin.png";
+              
               return (
-                <Link
+                <div
                   key={skin.id}
-                  href={`/skins/${skin.id}`}
                   className="skin-card-main"
+                  style={{ cursor: 'default' }}
                 >
-                  <div className="builds-img-placeholder">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={imageSrc} alt={skin.title} />
+                  <div className="skin-card-image-wrap" style={{ 
+                    width: '100%', 
+                    height: '100%',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}>
+                    <Skin3DViewer 
+                      skinUrl={imageSrc}
+                      title={skin.title}
+                      className="skin-card-canvas"
+                      width={305}
+                      height={440}
+                      autoRotate={true}
+                    />
                   </div>
-                </Link>
+                </div>
               );
             })
           )}
@@ -120,7 +133,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Блок СИДЫ: первый сид */}
+      {/* Блок СИДЫ с нормальными стрелками */}
       <section className="seeds-block">
         <h2 className="section-title-cyan">СИДЫ</h2>
         <div className="seeds-slider-wrap">
@@ -155,12 +168,31 @@ export default async function Home() {
               <p className="form-error">Сиды пока не загружены.</p>
             )}
           </div>
-          <button type="button" className="seeds-nav-btn prev" aria-label="Предыдущий" />
-          <button type="button" className="seeds-nav-btn next" aria-label="Следующий" />
+          
+          {/* Нормальные стрелки для слайдера сидов */}
+          <button 
+            type="button" 
+            className="seeds-nav-btn prev" 
+            aria-label="Предыдущий"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          
+          <button 
+            type="button" 
+            className="seeds-nav-btn next" 
+            aria-label="Следующий"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
         </div>
       </section>
 
-      {/* Блок моДЫ: первые 2 мода */}
+      {/* Блок моДЫ */}
       <section className="mods-block-home">
         <h2 className="section-title-cyan">моДЫ</h2>
         <div className="mods-images-row">
