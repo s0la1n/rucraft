@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { PageSection } from "../../components/PageSection";
-import { buildsApi, type BuildPost, resolveAssetUrl, getBaseUrl } from "@/lib/api";
+import { buildsApi, type BuildPost, resolveStorageUrl, getBaseUrl } from "@/lib/api";
 
 export default function BuildShowPage() {
   const params = useParams<{ id: string }>();
@@ -49,7 +49,7 @@ export default function BuildShowPage() {
             {build.images?.length > 0 && (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {build.images.map((src) => {
-                  const resolved = resolveAssetUrl(src) ?? src;
+                  const resolved = resolveStorageUrl(src) ?? src;
                   return (
                     <div key={src} className="overflow-hidden rounded-xl bg-zinc-200 dark:bg-zinc-700">
                       {/* eslint-disable-next-line @next/next/no-img-element */}

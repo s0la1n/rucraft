@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { PageSection } from "../components/PageSection";
-import { modsApi, type ModPost, resolveAssetUrl } from "@/lib/api";
+import { modsApi, type ModPost, resolveStorageUrl } from "@/lib/api";
 import { ModsToolbar } from "./ModsToolbar";
 import "./mods.css";
 
@@ -81,7 +81,7 @@ export default async function ModsPage(props: { searchParams?: SearchParams }) {
                 {mods.map((mod: ModPost) => {
                   const imageSrc =
                     mod.image_url ??
-                    resolveAssetUrl(mod.image) ??
+                    resolveStorageUrl(mod.image) ??
                     "/placeholder-mod.png";
                   return (
                     <article key={mod.id} className="mod-item">

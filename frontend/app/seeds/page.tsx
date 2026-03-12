@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PageSection } from "../components/PageSection";
-import { seedsApi, type SeedPost, resolveAssetUrl } from "@/lib/api";
+import { seedsApi, type SeedPost, resolveStorageUrl } from "@/lib/api";
 import MinecraftSeedGenerator from "../components/MinecraftSeedGenerator"; 
 
 export const metadata = {
@@ -48,7 +48,7 @@ export default async function SeedsPage() {
               {seeds.map((seed) => {
                 const imageSrc =
                   seed.image_url ??
-                  resolveAssetUrl(seed.image) ??
+                  resolveStorageUrl(seed.image) ??
                   "/placeholder-seed.png";
                 return (
                   <article key={seed.id} className="card">

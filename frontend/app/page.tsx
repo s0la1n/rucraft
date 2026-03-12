@@ -11,6 +11,7 @@ import {
   type SeedPost,
   type SkinPost,
   resolveAssetUrl,
+  resolveStorageUrl,
 } from "@/lib/api";
 
 async function getHomeData(): Promise<{
@@ -60,7 +61,7 @@ export default async function Home() {
           ) : (
             builds.map((build, index) => {
               const imageSrc =
-                build.image_url ?? resolveAssetUrl(build.image) ?? "/placeholder-build.png";
+                build.image_url ?? resolveStorageUrl(build.image) ?? "/placeholder-build.png";
               const wrapClass =
                 index === 0
                   ? "builds-img-wrap builds-img-1"
@@ -137,7 +138,7 @@ export default async function Home() {
                   <img
                     src={
                       firstSeed.image_url ??
-                      resolveAssetUrl(firstSeed.image) ??
+                      resolveStorageUrl(firstSeed.image) ??
                       "/placeholder-seed.png"
                     }
                     alt={firstSeed.title}
@@ -171,7 +172,7 @@ export default async function Home() {
           ) : (
             mods.map((mod, index) => {
               const imageSrc =
-                mod.image_url ?? resolveAssetUrl(mod.image) ?? "/placeholder-mod.png";
+                mod.image_url ?? resolveStorageUrl(mod.image) ?? "/placeholder-mod.png";
               const labelClass =
                 index === 0 ? "mods-img-label-left" : "mods-img-label-right";
               const labelText =
