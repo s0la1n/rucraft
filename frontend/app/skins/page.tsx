@@ -4,6 +4,7 @@ import { skinsApi, type SkinPost, type SkinsIndexResponse, resolveAssetUrl, getB
 import { SkinsToolbar } from "./SkinsToolbar";
 import { Skin3DViewer } from "./Skin3DViewer";
 import Link from "next/link";
+import "./style.css";
 
 export const metadata = {
   title: "Скины — RuCraft",

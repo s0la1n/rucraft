@@ -7,6 +7,7 @@ import { SkinCanvas, SkinCanvasRef } from "../SkinCanvas";
 import { Skin3DViewer } from "../Skin3DViewer";
 import { skinsApi } from "@/lib/api";
 import { useAuth } from "@/app/context/AuthContext";
+import "../style.css";
 
 const CATEGORIES = ["Смешные", "Для девочек", "Для мальчиков", "Аниме", "Мобы", "Милые", "Ютуберы"] as const;
 const MODELS = ["Steve", "Alex"] as const;
