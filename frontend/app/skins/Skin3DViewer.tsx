@@ -13,10 +13,10 @@ interface Skin3DViewerProps {
   height?: number;
 }
 
-export function Skin3DViewer({ 
-  skinUrl, 
+export function Skin3DViewer({
+  skinUrl,
   skinDataURL,
-  title, 
+  title,
   className,
   autoRotate = true,
   width = 220,
@@ -57,7 +57,7 @@ export function Skin3DViewer({
         // Получаем относительный URL через resolveAssetUrl
         const relativeUrl = resolveAssetUrl(trimmedUrl);
         console.log(`[Skin3DViewer] Relative URL for ${title}:`, relativeUrl);
-        
+
         if (!relativeUrl) {
           console.log(`[Skin3DViewer] Could not resolve URL for ${title}:`, trimmedUrl);
           setError('Не удалось преобразовать URL');
@@ -76,9 +76,9 @@ export function Skin3DViewer({
           const cleanRelative = relativeUrl.startsWith('/') ? relativeUrl : `/${relativeUrl}`;
           finalUrl = `${backendBase}${cleanRelative}`;
         }
-        
+
         console.log(`[Skin3DViewer] Final absolute URL for ${title}:`, finalUrl);
-        
+
       } catch (err) {
         console.error(`[Skin3DViewer] Error processing URL for ${title}:`, err);
         setError('Ошибка обработки URL');
@@ -112,12 +112,12 @@ export function Skin3DViewer({
         }
 
         const skinview3d = await import("skinview3d");
-        
+
         if (disposed || !containerRef.current) return;
 
         // Очищаем контейнер
         containerRef.current.innerHTML = "";
-        
+
         // Создаем canvas
         const canvas = document.createElement("canvas");
         canvas.width = width;
@@ -125,7 +125,7 @@ export function Skin3DViewer({
         canvas.style.width = "100%";
         canvas.style.height = "100%";
         canvas.style.display = "block";
-        
+
         containerRef.current.appendChild(canvas);
 
         // Создаем viewer
@@ -136,16 +136,16 @@ export function Skin3DViewer({
         });
 
         viewerRef.current = viewer;
-        
+
         // Настройки
         if (typeof viewer.zoom !== 'undefined') {
           viewer.zoom = 0.9;
         }
-        
+
         if (typeof viewer.autoRotate !== 'undefined') {
           viewer.autoRotate = autoRotate;
         }
-        
+
         if (viewer.playerObject) {
           viewer.playerObject.rotation.y = Math.PI / 4;
         }
@@ -176,7 +176,7 @@ export function Skin3DViewer({
             animationRef.current = requestAnimationFrame(animate);
           }
         };
-        
+
         animate();
 
       } catch (error) {
@@ -209,8 +209,8 @@ export function Skin3DViewer({
   }, [skinUrl, skinDataURL, title, autoRotate, width, height]);
 
   return (
-    <div 
-      ref={containerRef} 
+    <div
+      ref={containerRef}
       className={`skin-3d-viewer ${className || ''} ${isLoading ? 'loading' : ''} ${error ? 'error' : ''}`}
       style={{ width: '100%', height: '100%', minHeight: height }}
     />

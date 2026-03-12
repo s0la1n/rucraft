@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\BuildController;
 use App\Http\Controllers\Api\ModeController;
 use App\Http\Controllers\Api\SeedController;
 use App\Http\Controllers\Api\SkinController;
+use App\Http\Controllers\Api\QuizController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +26,11 @@ Route::get('/ping', function () {
 });
 
 Route::get('/developers', [DeveloperController::class, 'index']);
+
+// Тесты (публичные)
+Route::get('/quizzes', [QuizController::class, 'index']);
+Route::get('/quizzes/{quiz}', [QuizController::class, 'show']);
+Route::post('/quizzes/submit', [QuizController::class, 'submit']);
 
 // Публичные списки и страницы с подробной информацией
 Route::get('/builds', [BuildController::class, 'index']);

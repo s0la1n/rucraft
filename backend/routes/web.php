@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\QuizController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -66,3 +67,7 @@ Route::get('/content-image/{type}/{filename}', function ($type, $filename) {
         'Access-Control-Allow-Headers' => 'Content-Type',
     ]);
 })->where(['type' => '[a-z]+', 'filename' => '.*']);
+
+// Тест "Вы как мы"
+Route::get('/quiz', [QuizController::class, 'show'])->name('quiz.show');
+Route::post('/quiz/submit', [QuizController::class, 'submit'])->name('quiz.submit');

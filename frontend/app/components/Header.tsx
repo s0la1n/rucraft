@@ -10,6 +10,7 @@ const nav = [
   { href: "/skins", label: "СКИНЫ" },
   { href: "/seeds", label: "СИДЫ" },
   { href: "/mods", label: "МОДЫ" },
+  { href: "/quizzes", label: "ТЕСТЫ" },
 ] as const;
 
 export function Header() {
