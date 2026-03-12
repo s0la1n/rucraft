@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Skin;
+use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class SkinController extends Controller
 {
@@ -173,6 +175,75 @@ class SkinController extends Controller
             
             return response()->json([
                 'error' => 'Failed to load skin'
+            ], 500);
+        }
+    }
+
+    public function submit(Request $request): JsonResponse
+    {
+        try {
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'category' => 'required|in:Смешные,Для девочек,Для мальчиков,Аниме,Мобы,Милые,Ютуберы',
+                'model' => 'required|in:Steve,Alex',
+                'skin_file' => 'required|file|image|mimes:png|max:2048',
+            ]);
+
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            // Сохраняем файл
+            $file = $request->file('skin_file');
+            $filename = time() . '_' . Str::random(10) . '.png';
+            $path = $file->storeAs('skins', $filename, 'public');
+
+            if (!$path) {
+                throw new \Exception('Failed to upload file');
+            }
+
+            // Создаем запись в БД со статусом 'process'
+            $skin = Skin::create([
+                'user_id' => $user->id,
+                'title' => $request->title,
+                'category' => $request->category,
+                'model' => $request->model,
+                'skin_texture_file' => $path,
+                'status' => 'process', // Статус "на рассмотрении"
+            ]);
+
+            Log::info('Skin submitted for review', [
+                'skin_id' => $skin->id,
+                'user_id' => $user->id,
+                'title' => $skin->title,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Skin submitted for review successfully',
+                'data' => [
+                    'id' => $skin->id,
+                    'title' => $skin->title,
+                    'status' => $skin->status,
+                ]
+            ], 201);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'error' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Error submitting skin', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'error' => 'Failed to submit skin',
+                'message' => $e->getMessage()
             ], 500);
         }
     }
