@@ -5,6 +5,7 @@ import Link from "next/link";
 import { RequireAuth } from "../../components/RequireAuth";
 import { PageSection } from "../../components/PageSection";
 import { modModerationApi, ModModerationRequest, getBackendBaseUrl } from "@/lib/api";
+import "../admin.css";
 
 // Функция для получения URL изображения
 function getImageUrl(imagePath: string | null): string {

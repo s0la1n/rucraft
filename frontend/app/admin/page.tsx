@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { RequireAuth } from "../components/RequireAuth";
 import { PageSection } from "../components/PageSection";
+import "./admin.css";
 
 const adminTabs = [
   { href: "/admin/analytics", label: "Аналитика" },
