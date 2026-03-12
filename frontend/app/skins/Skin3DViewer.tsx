@@ -1,4 +1,3 @@
-// app/skins/Skin3DViewer.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -6,79 +5,57 @@ import { resolveAssetUrl } from "@/lib/api";
 
 interface Skin3DViewerProps {
   skinUrl?: string | null;
+  skinDataURL?: string | null; // Для предпросмотра нарисованного скина
   title: string;
   className?: string;
+  autoRotate?: boolean;
+  width?: number;
+  height?: number;
 }
 
-export function Skin3DViewer({ skinUrl, title, className }: Skin3DViewerProps) {
+export function Skin3DViewer({ 
+  skinUrl, 
+  skinDataURL,
+  title, 
+  className,
+  autoRotate = true,
+  width = 220,
+  height = 260
+}: Skin3DViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<any>(null);
   const animationRef = useRef<number | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Отладка
-    console.log(`[SKIN_DEBUG] ${title}:`, {
-      skinUrl,
-      type: typeof skinUrl,
-      isNull: skinUrl === null,
-    });
-    
-    // Если нет контейнера - выходим
-    if (!containerRef.current) return;
+    let disposed = false;
+    let finalUrl: string | null = null;
 
-    // Получаем правильный URL через resolveAssetUrl
-    let resolvedUrl: string | null = null;
-    
-    try {
-      // БЕЗОПАСНО: проверяем skinUrl перед использованием
-      if (skinUrl === null || skinUrl === undefined) {
-        console.log(`[Skin3DViewer] No skin URL for ${title}`);
-        setError('Нет URL скина');
-        showPlaceholder(containerRef.current, title);
+    // Определяем какой URL использовать
+    if (skinDataURL) {
+      finalUrl = skinDataURL;
+      console.log(`[Skin3DViewer] Using data URL for ${title}`);
+    } else if (skinUrl) {
+      try {
+        finalUrl = resolveAssetUrl(skinUrl);
+        console.log(`[Skin3DViewer] Resolved URL for ${title}:`, finalUrl);
+      } catch (err) {
+        console.error(`[Skin3DViewer] Error resolving URL:`, err);
+        setError('Ошибка загрузки');
+        setIsLoading(false);
         return;
       }
+    }
 
-      // Проверяем тип
-      if (typeof skinUrl !== 'string') {
-        console.log(`[Skin3DViewer] Invalid skin URL type for ${title}:`, typeof skinUrl);
-        setError('Неверный тип URL');
-        showPlaceholder(containerRef.current, title);
-        return;
-      }
-
-      // Только теперь безопасно вызываем trim()
-      const trimmedUrl = skinUrl.trim();
-      if (!trimmedUrl || trimmedUrl === 'null' || trimmedUrl === 'undefined') {
-        console.log(`[Skin3DViewer] Empty skin URL for ${title}`);
-        setError('Пустой URL');
-        showPlaceholder(containerRef.current, title);
-        return;
-      }
-
-      // Получаем финальный URL через resolveAssetUrl
-      resolvedUrl = resolveAssetUrl(trimmedUrl);
-      
-      console.log(`[Skin3DViewer] Resolved URL for ${title}:`, resolvedUrl);
-      
-      if (!resolvedUrl) {
-        console.log(`[Skin3DViewer] Could not resolve URL for ${title}:`, trimmedUrl);
-        setError('Не удалось преобразовать URL');
-        showPlaceholder(containerRef.current, title);
-        return;
-      }
-
-      console.log(`[Skin3DViewer] Loading skin for ${title}:`, resolvedUrl);
-      
-    } catch (err) {
-      console.error(`[Skin3DViewer] Error processing URL for ${title}:`, err);
-      setError('Ошибка обработки URL');
-      showPlaceholder(containerRef.current, title);
+    if (!finalUrl) {
+      console.log(`[Skin3DViewer] No URL for ${title}`);
+      setError('Нет изображения');
+      setIsLoading(false);
       return;
     }
 
-    // Если дошли до сюда, значит resolvedUrl есть
-    let disposed = false;
+    if (!containerRef.current) return;
 
     const initViewer = async () => {
       try {
@@ -88,9 +65,7 @@ export function Skin3DViewer({ skinUrl, title, className }: Skin3DViewerProps) {
             if (typeof viewerRef.current.dispose === 'function') {
               viewerRef.current.dispose();
             }
-          } catch (e) {
-            // Игнорируем
-          }
+          } catch (e) {}
           viewerRef.current = null;
         }
 
@@ -108,8 +83,8 @@ export function Skin3DViewer({ skinUrl, title, className }: Skin3DViewerProps) {
         
         // Создаем canvas
         const canvas = document.createElement("canvas");
-        canvas.width = containerRef.current.clientWidth || 220;
-        canvas.height = containerRef.current.clientHeight || 260;
+        canvas.width = width;
+        canvas.height = height;
         canvas.style.width = "100%";
         canvas.style.height = "100%";
         canvas.style.display = "block";
@@ -119,8 +94,8 @@ export function Skin3DViewer({ skinUrl, title, className }: Skin3DViewerProps) {
         // Создаем viewer
         const viewer = new skinview3d.SkinViewer({
           canvas: canvas,
-          width: canvas.width,
-          height: canvas.height
+          width: width,
+          height: height
         });
 
         viewerRef.current = viewer;
@@ -131,22 +106,24 @@ export function Skin3DViewer({ skinUrl, title, className }: Skin3DViewerProps) {
         }
         
         if (typeof viewer.autoRotate !== 'undefined') {
-          viewer.autoRotate = true;
+          viewer.autoRotate = autoRotate;
         }
         
         if (viewer.playerObject) {
           viewer.playerObject.rotation.y = Math.PI / 4;
         }
 
-        // Загружаем скин с обработкой ошибок
+        // Загружаем скин
+        setIsLoading(true);
         try {
-          await viewer.loadSkin(resolvedUrl!);
+          await viewer.loadSkin(finalUrl!);
           setError(null);
           console.log(`[Skin3DViewer] Successfully loaded skin for ${title}`);
         } catch (loadError) {
-          console.warn(`[Skin3DViewer] Failed to load skin for ${title}:`, loadError);
-          setError('Ошибка загрузки текстуры');
-          showPlaceholder(containerRef.current, title);
+          console.warn(`[Skin3DViewer] Failed to load skin:`, loadError);
+          setError('Ошибка загрузки');
+        } finally {
+          setIsLoading(false);
         }
 
         // Анимация
@@ -167,20 +144,12 @@ export function Skin3DViewer({ skinUrl, title, className }: Skin3DViewerProps) {
 
       } catch (error) {
         console.error('Error initializing skinview3d:', error);
-        setError('Ошибка инициализации 3D');
-        if (containerRef.current && !disposed) {
-          showPlaceholder(containerRef.current, title);
-        }
+        setError('Ошибка инициализации');
+        setIsLoading(false);
       }
     };
 
     initViewer();
-
-    // Функция для показа плейсхолдера
-    function showPlaceholder(container: HTMLDivElement, text: string) {
-      if (disposed) return;
-      container.innerHTML = `<div class="skin-card-canvas-placeholder">${text}</div>`;
-    }
 
     return () => {
       disposed = true;
@@ -193,16 +162,20 @@ export function Skin3DViewer({ skinUrl, title, className }: Skin3DViewerProps) {
           if (typeof viewerRef.current.dispose === 'function') {
             viewerRef.current.dispose();
           }
-        } catch (e) {
-          // Игнорируем
-        }
+        } catch (e) {}
         viewerRef.current = null;
       }
       if (containerRef.current) {
         containerRef.current.innerHTML = "";
       }
     };
-  }, [skinUrl, title]);
+  }, [skinUrl, skinDataURL, title, autoRotate, width, height]);
 
-  return <div ref={containerRef} className={`skin-card-canvas ${className || ''}`} />;
+  return (
+    <div 
+      ref={containerRef} 
+      className={`skin-3d-viewer ${className || ''} ${isLoading ? 'loading' : ''} ${error ? 'error' : ''}`}
+      style={{ width: '100%', height: '100%', minHeight: height }}
+    />
+  );
 }

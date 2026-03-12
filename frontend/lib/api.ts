@@ -1,14 +1,14 @@
+// lib/api.ts
+
 export const getBaseUrl = () =>
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
 
 export const getBackendBaseUrl = () => {
-  const apiBase = getBaseUrl(); // Используем уже готовую функцию
-  // Безопасно заменяем, гарантируя, что работаем со строкой
+  const apiBase = getBaseUrl();
   return String(apiBase).replace(/\/api\/?$/, "");
 };
 
 export const resolveAssetUrl = (path?: string | null): string | null => {
-  // Безопасная проверка
   if (path === null || path === undefined) {
     console.log('[resolveAssetUrl] Path is null or undefined');
     return null;
@@ -25,15 +25,11 @@ export const resolveAssetUrl = (path?: string | null): string | null => {
     return null;
   }
 
-  // Если это уже полный URL с другим доменом
   if (/^(?:https?:)?\/\//.test(cleanPath) && !cleanPath.includes('localhost:8000')) {
     return cleanPath;
   }
 
-  // Извлекаем имя файла из пути
   const filename = cleanPath.split('/').pop() || '';
-  
-  // Используем прокси маршрут
   return `/skin-image/${encodeURIComponent(filename)}`;
 };
 
@@ -52,31 +48,187 @@ export function clearAuthToken(): void {
   if (typeof window !== "undefined") localStorage.removeItem("rucraft_token");
 }
 
+// Функция для получения CSRF cookie
+export async function getCsrfCookie(): Promise<boolean> {
+  const baseUrl = getBackendBaseUrl();
+  const url = `${baseUrl}/sanctum/csrf-cookie`;
+  
+  console.log('[CSRF] Getting cookie from:', url);
+  
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      credentials: 'include',
+      mode: 'cors',
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+    
+    console.log('[CSRF] Response status:', response.status);
+    
+    if (!response.ok) {
+      console.error('[CSRF] Failed:', await response.text());
+      return false;
+    }
+    
+    // Проверяем, установились ли cookies
+    const cookies = document.cookie;
+    console.log('[CSRF] Document cookies after request:', cookies);
+    
+    // Ждем установки cookie
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Проверяем наличие XSRF-TOKEN
+    const hasXsrfToken = cookies.includes('XSRF-TOKEN=');
+    console.log('[CSRF] Has XSRF-TOKEN:', hasXsrfToken);
+    
+    return true;
+    
+  } catch (error) {
+    console.error('[CSRF] Error:', error);
+    return false;
+  }
+}
+
+// Функция apiFetch с поддержкой FormData
 export async function apiFetch<T = unknown>(
   path: string,
-  options?: RequestInit & { token?: string | null }
+  options?: RequestInit & { token?: string | null; requiresCsrf?: boolean; isFormData?: boolean }
 ): Promise<T> {
-  const { token: optToken, ...rest } = options ?? {};
+  const { token: optToken, requiresCsrf, isFormData, ...rest } = options ?? {};
   const token = optToken ?? getToken();
+  
   const url = `${getBaseUrl().replace(/\/$/, "")}/${path.replace(/^\//, "")}`;
-  const res = await fetch(url, {
-    ...rest,
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...rest.headers,
-    },
-  });
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({})) as ApiError & { errors?: Record<string, string[]> };
-    const msg =
-      data.message ??
-      (data.errors ? Object.values(data.errors).flat().join(", ") : null) ??
-      `${res.status} ${res.statusText}`;
-    throw new Error(msg);
+  
+  console.log(`[API] Fetching ${url}, requiresCsrf: ${requiresCsrf}, isFormData: ${isFormData}`);
+  
+  // Для маршрутов, требующих CSRF
+  let xsrfToken: string | null = null;
+  if (requiresCsrf) {
+    console.log('[API] Getting CSRF cookie for:', path);
+    await getCsrfCookie();
+    
+    // Извлекаем XSRF-TOKEN из cookie
+    const cookies = document.cookie.split(';');
+    for (const cookie of cookies) {
+      const [name, value] = cookie.trim().split('=');
+      if (name === 'XSRF-TOKEN') {
+        xsrfToken = decodeURIComponent(value);
+        console.log('[API] Found XSRF token in cookies');
+        break;
+      }
+    }
   }
-  return res.json() as Promise<T>;
+  
+  const headers: Record<string, string> = {
+    "Accept": "application/json",
+    "X-Requested-With": "XMLHttpRequest",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...rest.headers as Record<string, string>,
+  };
+  
+  // Для FormData не устанавливаем Content-Type
+  if (!isFormData) {
+    headers["Content-Type"] = "application/json";
+  }
+  
+  // Добавляем XSRF-TOKEN в заголовок для Laravel
+  if (xsrfToken) {
+    headers['X-XSRF-TOKEN'] = xsrfToken;
+    console.log('[API] Added X-XSRF-TOKEN header');
+  }
+  
+  const fetchOptions: RequestInit = {
+    ...rest,
+    credentials: 'include',
+    headers,
+  };
+  
+  // Для FormData не нужно преобразовывать body
+  if (!isFormData && rest.body && typeof rest.body !== 'string') {
+    fetchOptions.body = JSON.stringify(rest.body);
+  }
+  
+  try {
+    const res = await fetch(url, fetchOptions);
+    console.log(`[API] Response status: ${res.status} for ${path}`);
+    
+    if (!res.ok) {
+      // Пробуем получить тело ошибки
+      let errorData: any = {};
+      try {
+        errorData = await res.json();
+        console.log('[API] Error data:', errorData);
+      } catch {
+        const text = await res.text();
+        console.log('[API] Error text:', text);
+      }
+      
+      if (res.status === 419) {
+        console.error('[API] CSRF token error');
+        
+        if (requiresCsrf) {
+          console.log('[API] Retrying once with fresh CSRF token...');
+          
+          // Получаем новый CSRF cookie и токен
+          await getCsrfCookie();
+          
+          // Извлекаем новый токен
+          let newXsrfToken: string | null = null;
+          const cookies = document.cookie.split(';');
+          for (const cookie of cookies) {
+            const [name, value] = cookie.trim().split('=');
+            if (name === 'XSRF-TOKEN') {
+              newXsrfToken = decodeURIComponent(value);
+              break;
+            }
+          }
+          
+          // Обновляем заголовок
+          if (newXsrfToken) {
+            headers['X-XSRF-TOKEN'] = newXsrfToken;
+          }
+          
+          // Пробуем еще раз
+          const retryRes = await fetch(url, {
+            ...fetchOptions,
+            headers, // Используем обновленные заголовки
+          });
+          console.log(`[API] Retry response status: ${retryRes.status}`);
+          
+          if (retryRes.ok) {
+            return retryRes.json() as Promise<T>;
+          }
+          
+          // Если повторный запрос тоже не удался
+          let retryErrorData: any = {};
+          try {
+            retryErrorData = await retryRes.json();
+          } catch {
+            // игнорируем
+          }
+          
+          const retryMsg = retryErrorData.message || 
+                          (retryErrorData.errors ? Object.values(retryErrorData.errors).flat().join(", ") : null) ||
+                          `${retryRes.status} ${retryRes.statusText}`;
+          throw new Error(retryMsg);
+        }
+      }
+      
+      const msg = errorData.message ||
+                 (errorData.errors ? Object.values(errorData.errors).flat().join(", ") : null) ||
+                 `${res.status} ${res.statusText}`;
+      throw new Error(msg);
+    }
+    
+    return res.json() as Promise<T>;
+    
+  } catch (error) {
+    console.error('[API] Fetch error:', error);
+    throw error;
+  }
 }
 
 export type PingResponse = {
@@ -114,18 +266,21 @@ export const authApi = {
     apiFetch<RegisterResponse>("register", {
       method: "POST",
       body: JSON.stringify(body),
+      requiresCsrf: true,
     }),
 
   login: (body: { login: string; password: string }) =>
     apiFetch<LoginResponse>("login", {
       method: "POST",
       body: JSON.stringify(body),
+      requiresCsrf: true,
     }),
 
   logout: () =>
     apiFetch<{ message: string }>("logout", {
       method: "POST",
       token: getToken(),
+      requiresCsrf: true,
     }),
 
   me: () =>
@@ -289,7 +444,9 @@ export const skinsApi = {
     const query = q.toString();
     return apiFetch<SkinsIndexResponse>(`skins${query ? `?${query}` : ""}`);
   },
+  
   show: (id: number) => apiFetch<ShowResponse<SkinPost>>(`skins/${id}`),
+  
   create: (formData: FormData) => {
     const base = getBaseUrl().replace(/\/$/, "");
     const token = typeof window !== "undefined" ? localStorage.getItem("rucraft_token") : null;
@@ -301,6 +458,17 @@ export const skinsApi = {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error((data as { message?: string }).message ?? String(res.status));
       return data as CreateSkinResponse;
+    });
+  },
+  
+  // Метод для отправки на рассмотрение
+  submitForReview: async (formData: FormData) => {
+    return apiFetch<{ success: boolean; message: string; data?: any }>("skins/submit", {
+      method: "POST",
+      token: getToken(),
+      requiresCsrf: true,
+      isFormData: true,
+      body: formData,
     });
   },
 };
