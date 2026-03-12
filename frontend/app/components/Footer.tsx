@@ -1,10 +1,12 @@
+import Link from "next/link";
+
 export function Footer() {
   return (
     <footer className="site-footer">
       <div className="site-footer-inner">
-        <div className="site-footer-logo">
+        <Link  href="/" className="site-footer-logo">
           <img src="/logo.svg" alt="RuCraft" width={314} height={87} />
-        </div>
+        </Link>
         <div className="site-footer-content">
           <div className="site-footer-text">
             <div>наш сайт вконтакте честное слово сами делали</div>

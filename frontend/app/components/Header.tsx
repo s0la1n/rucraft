@@ -20,7 +20,7 @@ export function Header() {
     <header className="site-header">
       <div className="site-header-inner">
         <Link href="/" className="site-logo" aria-label="RuCraft — на главную" onClick={() => setMenuOpen(false)}>
-          RuCraft
+          <img src="./logo.svg" alt="логотип" />
         </Link>
 
         <button
@@ -59,10 +59,10 @@ export function Header() {
             ) : (
               <>
                 <Link href="/auth/login" className="btn-auth" onClick={() => setMenuOpen(false)}>
-                  Войти
+                  ВОЙТИ
                 </Link>
                 <Link href="/auth/register" className="btn-auth btn-register" onClick={() => setMenuOpen(false)}>
-                  Зарегистрироваться
+                  ЗАРЕГИСТРИРОВАТЬСЯ
                 </Link>
               </>
             )}
