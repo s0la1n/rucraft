@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { resolveAssetUrl } from "@/lib/api";
+import { getBackendBaseUrl, resolveAssetUrl } from "@/lib/api";
 
 interface Skin3DViewerProps {
   skinUrl?: string | null;
-  skinDataURL?: string | null; // Для предпросмотра нарисованного скина
+  skinDataURL?: string | null;
   title: string;
   className?: string;
   autoRotate?: boolean;
@@ -46,7 +46,6 @@ export function Skin3DViewer({
           return;
         }
 
-        // Только теперь безопасно вызываем trim()
         const trimmedUrl = skinUrl.trim();
         if (!trimmedUrl || trimmedUrl === 'null' || trimmedUrl === 'undefined') {
           console.log(`[Skin3DViewer] Empty skin URL for ${title}`);
@@ -55,19 +54,30 @@ export function Skin3DViewer({
           return;
         }
 
-        // Используем только resolveAssetUrl
-        finalUrl = resolveAssetUrl(trimmedUrl);
+        // Получаем относительный URL через resolveAssetUrl
+        const relativeUrl = resolveAssetUrl(trimmedUrl);
+        console.log(`[Skin3DViewer] Relative URL for ${title}:`, relativeUrl);
         
-        console.log(`[Skin3DViewer] Resolved URL for ${title}:`, finalUrl);
-        
-        if (!finalUrl) {
+        if (!relativeUrl) {
           console.log(`[Skin3DViewer] Could not resolve URL for ${title}:`, trimmedUrl);
           setError('Не удалось преобразовать URL');
           setIsLoading(false);
           return;
         }
 
-        console.log(`[Skin3DViewer] Loading skin for ${title}:`, finalUrl);
+        // Для skinview3d нужен абсолютный URL
+        // Если URL уже абсолютный - используем как есть
+        if (relativeUrl.startsWith('http')) {
+          finalUrl = relativeUrl;
+        } else {
+          // Иначе добавляем базовый URL бэкенда
+          const backendBase = getBackendBaseUrl().replace(/\/$/, "");
+          // Убираем лишние слеши
+          const cleanRelative = relativeUrl.startsWith('/') ? relativeUrl : `/${relativeUrl}`;
+          finalUrl = `${backendBase}${cleanRelative}`;
+        }
+        
+        console.log(`[Skin3DViewer] Final absolute URL for ${title}:`, finalUrl);
         
       } catch (err) {
         console.error(`[Skin3DViewer] Error processing URL for ${title}:`, err);
