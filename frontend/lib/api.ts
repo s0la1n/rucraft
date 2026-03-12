@@ -204,6 +204,8 @@ export type ModPost = {
   file_url: string;
   author: ContentAuthor;
   created_at: string;
+  version?: string | null;
+  minecraft_version?: string | null;
 };
 
 export type SeedPost = {
@@ -242,11 +244,6 @@ export const buildsApi = {
   show: (id: number) => apiFetch<ShowResponse<BuildPost>>(`builds/${id}`),
 };
 
-export const modsApi = {
-  index: () => apiFetch<{ data: ModPost[] }>("mods"),
-  show: (id: number) => apiFetch<ShowResponse<ModPost>>(`mods/${id}`),
-};
-
 export const seedsApi = {
   index: () => apiFetch<{ data: SeedPost[] }>("seeds"),
   show: (id: number) => apiFetch<ShowResponse<SeedPost>>(`seeds/${id}`),
@@ -258,6 +255,38 @@ export type SkinsIndexResponse = {
   last_page: number;
   per_page: number;
   total: number;
+};
+
+export type ModsIndexResponse = {
+  data: ModPost[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+};
+
+export const modsApi = {
+  index: (params?: { 
+    page?: number; 
+    version?: string; 
+    minecraft_version?: string;
+    search?: string;
+  }) => {
+    const q = new URLSearchParams();
+    if (params?.page) q.set("page", String(params.page));
+    if (params?.version) q.set("version", params.version);
+    if (params?.minecraft_version) q.set("minecraft_version", params.minecraft_version);
+    if (params?.search) q.set("search", params.search);
+    const query = q.toString();
+    return apiFetch<ModsIndexResponse>(`mods${query ? `?${query}` : ""}`);
+  },
+  show: (id: number) => apiFetch<ShowResponse<ModPost>>(`mods/${id}`),
+  
+  getVersions: () => 
+    apiFetch<{ data: string[] }>('mods/versions'),
+    
+  getMinecraftVersions: () => 
+    apiFetch<{ data: string[] }>('mods/minecraft-versions'),
 };
 
 export type CreateSkinResponse = { message: string; data: { id: number; title: string; category: string } };

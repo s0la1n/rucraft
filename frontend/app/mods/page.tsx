@@ -1,6 +1,9 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { PageSection } from "../components/PageSection";
 import { modsApi, type ModPost, resolveAssetUrl } from "@/lib/api";
+import { ModsToolbar } from "./ModsToolbar";
+import "./mods.css";
 
 export const metadata = {
   title: "Моды — RuCraft",
@@ -13,54 +16,123 @@ const apiErrorMessage = (
   </p>
 );
 
-async function getMods(): Promise<{ data: ModPost[]; error?: boolean }> {
+async function getMods(params: { 
+  page?: number; 
+  version?: string; 
+  minecraft_version?: string;
+  search?: string;
+}): Promise<{ data: ModPost[]; current_page: number; last_page: number; total: number; error?: boolean }> {
   try {
-    const res = await modsApi.index();
-    return { data: res.data };
+    const res = await modsApi.index(params);
+    return res;
   } catch (err) {
     console.error("Mods fetch failed:", err);
-    return { data: [], error: true };
+    return { data: [], current_page: 1, last_page: 1, total: 0, error: true };
   }
 }
 
-export default async function ModsPage() {
-  const { data: mods, error: fetchFailed } = await getMods();
+type SearchParams = Promise<{ 
+  page?: string; 
+  version?: string; 
+  minecraft_version?: string;
+  search?: string;
+}> | { 
+  page?: string; 
+  version?: string; 
+  minecraft_version?: string;
+  search?: string;
+};
+
+export default async function ModsPage(props: { searchParams?: SearchParams }) {
+  const searchParams = props.searchParams instanceof Promise 
+    ? await props.searchParams 
+    : (props.searchParams ?? {});
+  
+  const page = Math.max(1, parseInt(String(searchParams.page || "1"), 10) || 1);
+  const version = searchParams.version ?? "";
+  const minecraftVersion = searchParams.minecraft_version ?? "";
+  const search = searchParams.search ?? "";
+
+  const modsData = await getMods({ 
+    page, 
+    version: version || undefined,
+    minecraft_version: minecraftVersion || undefined,
+    search: search || undefined
+  });
+  
+  
+  const { data: mods, current_page, last_page, error: fetchFailed } = modsData;
 
   return (
     <div className="page-content">
       <PageSection title="Моды">
-        {fetchFailed ? (
-          apiErrorMessage
-        ) : mods.length === 0 ? (
-          <p>Модов пока нет.</p>
-        ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-            {mods.map((mod) => {
-              const imageSrc =
-                mod.image_url ??
-                resolveAssetUrl(mod.image) ??
-                "/placeholder-mod.png";
-              return (
-                <article key={mod.id} className="card">
-                  <div className="card-image">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={imageSrc} alt={mod.title} />
-                  </div>
-                <div className="card-body">
-                  <h3 className="card-title">{mod.title}</h3>
-                  <p className="card-meta">
-                    Автор: <strong>{mod.author.name}</strong>
-                  </p>
-                  {mod.description && <p className="card-text line-clamp-3">{mod.description}</p>}
-                    <Link href={`/mods/${mod.id}`} className="btn-link mt-3 inline-flex">
-                      Подробнее
-                    </Link>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        )}
+        <div className="mods-list-page">
+          <Suspense fallback={null}>
+            <ModsToolbar />
+          </Suspense>
+
+          {fetchFailed ? (
+            apiErrorMessage
+          ) : mods.length === 0 ? (
+            <p>Модов пока нет.</p>
+          ) : (
+            <>
+              <div className="mods-list">
+                {mods.map((mod: ModPost) => {
+                  const imageSrc =
+                    mod.image_url ??
+                    resolveAssetUrl(mod.image) ??
+                    "/placeholder-mod.png";
+                  return (
+                    <article key={mod.id} className="mod-item">
+                      <div className="mod-info">
+                        <div className="mod-header">
+                          <h3 className="mod-title">{mod.title}</h3>
+                          <p className="mod-author">
+                            Автор: <strong>{mod.author.name}</strong>
+                          </p>
+                        </div>
+                        <div className="mod-image">
+                          <img src={imageSrc} alt={mod.title} />
+                        </div>
+                        <div className="mod-badges">
+                          {mod.version && (
+                            <span className="badge">{mod.version}</span>
+                          )}
+                          {mod.minecraft_version && (
+                            <span className="badge">MC {mod.minecraft_version}</span>
+                          )}
+                        </div>
+                        {mod.description && <p className="mod-desc">{mod.description}</p>}
+                        <Link href={`/mods/${mod.id}`} className="btn-download">
+                          gодробнее
+                        </Link>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+
+              {last_page > 1 && (
+                <nav className="pagination">
+                  {current_page > 1 && (
+                    <a href={`/mods?page=${current_page - 1}${version ? `&version=${encodeURIComponent(version)}` : ''}${minecraftVersion ? `&minecraft_version=${encodeURIComponent(minecraftVersion)}` : ''}${search ? `&search=${encodeURIComponent(search)}` : ''}`} className="page-arrow">
+                      &lt;
+                    </a>
+                  )}
+                  <span className="page-current">
+                    {current_page} / {last_page}
+                  </span>
+                  {current_page < last_page && (
+                    <a href={`/mods?page=${current_page + 1}${version ? `&version=${encodeURIComponent(version)}` : ''}${minecraftVersion ? `&minecraft_version=${encodeURIComponent(minecraftVersion)}` : ''}${search ? `&search=${encodeURIComponent(search)}` : ''}`} className="page-arrow">
+                      &gt;
+                    </a>
+                  )}
+                </nav>
+              )}
+            </>
+          )}
+        </div>
       </PageSection>
     </div>
   );
