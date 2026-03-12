@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import "./developers-slider.css";
+import "./developers-cards.css";
 
 type Developer = {
   id: number;
