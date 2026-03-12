@@ -25,6 +25,8 @@ Route::get('/developers', [DeveloperController::class, 'index']);
 Route::get('/builds', [BuildController::class, 'index']);
 Route::get('/builds/{build}', [BuildController::class, 'show']);
 Route::get('/builds/{build}/download', [BuildController::class, 'downloadFile']);
+Route::get('/builds/difficulties', [BuildController::class, 'difficulties']);
+Route::post('/builds', [BuildController::class, 'store'])->middleware('auth:sanctum');
 
 Route::prefix('mods')->group(function () {
     Route::get('/', [ModeController::class, 'index']);

@@ -22,7 +22,13 @@ class BuildSeeder extends Seeder
                 'build_file' => 'builds/Алхимическая_лаборатория/alchemy_laboratory.nbt',
                 'description' => 'Это лаборатория алхимика, отлично смотрится в магическом городе. В ней есть подвал, первый и второй этажи. В подвале находится чаровальня, на втором этаже - спальня. Постройка состоит из белого бетона и пурпурных блоков.',
                 'difficulty' => 'обычная',
-                'materials' => [],
+                'materials' => [
+                    ['name' => 'белый бетон', 'count' => 256],
+                    ['name' => 'пурпурный блок', 'count' => 128],
+                    ['name' => 'стекло', 'count' => 64],
+                    ['name' => 'камень', 'count' => 192],
+                    ['name' => 'доски', 'count' => 96],
+                ],
                 'status' => 'active',
                 'images' => [
                     'builds/Алхимическая_лаборатория/Превью.png',
@@ -37,7 +43,12 @@ class BuildSeeder extends Seeder
                 'build_file' => 'builds/База_пиратов/pirate_base.nbt',
                 'description' => 'Это пиратская база (либо просто "пляжный домик"). Конечно, смотрится красиво, если построить где-то на берегу моря. На крыше домика находятся морские огурцы, по бокам - лианы. Эту декорацию можно использовать заместо дома.',
                 'difficulty' => 'легкая',
-                'materials' => [],
+                'materials' => [
+                    ['name' => 'доски', 'count' => 320],
+                    ['name' => 'камень', 'count' => 128],
+                    ['name' => 'стекло', 'count' => 48],
+                    ['name' => 'палка', 'count' => 64],
+                ],
                 'status' => 'active',
                 'images' => [
                     'builds/База_пиратов/Превью.png',
@@ -53,7 +64,11 @@ class BuildSeeder extends Seeder
                 'build_file' => 'builds/Вавилонская_башня/vavylon_tower.schematic',
                 'description' => 'Перед вами одно из чудес архитектуры - Вавилонская башня. Она довольно высокая, состоит из множества этажей. Построена башня в основном из песчаника.',
                 'difficulty' => 'легкая',
-                'materials' => [],
+                'materials' => [
+                    ['name' => 'песчаник', 'count' => 1024],
+                    ['name' => 'каменный кирпич', 'count' => 512],
+                    ['name' => 'стекло', 'count' => 128],
+                ],
                 'status' => 'active',
                 'images' => [
                     'builds/Вавилонская_башня/Превью.png',
@@ -69,7 +84,11 @@ class BuildSeeder extends Seeder
                 'build_file' => 'builds/Двойной_дом_в_горе/in_mountain_house.nbt',
                 'description' => 'Красивый дом, который подходит для размещения в скале. В нём можно сказать, 2 дома в одном, так как там 2 окна. Для строительства используются еловые доски и стекло, внутри дом обустроен.',
                 'difficulty' => 'обычная',
-                'materials' => [],
+                'materials' => [
+                    ['name' => 'еловые доски', 'count' => 384],
+                    ['name' => 'стекло', 'count' => 96],
+                    ['name' => 'камень', 'count' => 256],
+                ],
                 'status' => 'active',
                 'images' => [
                     'builds/Двойной_дом_в_горе/Превью.png',
@@ -84,7 +103,12 @@ class BuildSeeder extends Seeder
                 'build_file' => 'builds/Дом_с_конюшней/horse_house.nbt',
                 'description' => 'Это дом, построенный в деревенском стиле. К нему спереди пристроен дворик для лошадей, а также вход в конюшню. Если подняться по ступенькам, то вы попадёте в сам дом. Там есть спальня и декорации на потолке.',
                 'difficulty' => 'легкая',
-                'materials' => [],
+                'materials' => [
+                    ['name' => 'доски', 'count' => 448],
+                    ['name' => 'камень', 'count' => 192],
+                    ['name' => 'стекло', 'count' => 64],
+                    ['name' => 'палка', 'count' => 48],
+                ],
                 'status' => 'active',
                 'images' => [
                     'builds/Дом_с_конюшней/Превью.png',
@@ -100,7 +124,10 @@ class BuildSeeder extends Seeder
                 'build_file' => 'builds/Зернохранилище/granary.nbt',
                 'description' => 'Это зернохранилище. Оно будет идеальной частью, например в деревне. Построено зернохранилище несложно: из досок и из камня. В этой постройке можно хранить сено и другие предметы.',
                 'difficulty' => 'обычная',
-                'materials' => [],
+                'materials' => [
+                    ['name' => 'доски', 'count' => 256],
+                    ['name' => 'камень', 'count' => 128],
+                ],
                 'status' => 'active',
                 'images' => [
                     'builds/Зернохранилище/Превью.png',
@@ -115,7 +142,11 @@ class BuildSeeder extends Seeder
                 'build_file' => 'builds/Красивый_дом_из_земли/middleage_small_castle.schematic',
                 'description' => 'Это дом, сделанный из земли. Отлично подходит для начала, так как не нужно раскошеливаться, чтобы построить его. Внутри дом заполнен интерьером, состоит из двух этажей. Смотрится в биоме равнина.',
                 'difficulty' => 'легкая',
-                'materials' => [],
+                'materials' => [
+                    ['name' => 'земля', 'count' => 512],
+                    ['name' => 'доски', 'count' => 128],
+                    ['name' => 'стекло', 'count' => 32],
+                ],
                 'status' => 'active',
                 'images' => [
                     'builds/Красивый_дом_из_земли/Превью.png',
@@ -131,7 +162,11 @@ class BuildSeeder extends Seeder
                 'build_file' => 'builds/Небольшая_средневековая_крепость/middleage_small_castle.schematic',
                 'description' => 'Это небольшой, но красивый замок. Внутри замка есть дворик, конюшня и колодец. Подходит он под стиль средневековья, так как построен из камня и из досок.',
                 'difficulty' => 'обычная',
-                'materials' => [],
+                'materials' => [
+                    ['name' => 'каменный кирпич', 'count' => 768],
+                    ['name' => 'доски', 'count' => 256],
+                    ['name' => 'стекло', 'count' => 96],
+                ],
                 'status' => 'active',
                 'images' => [
                     'builds/Небольшая_средневековая_крепость/Превью.png',
@@ -147,7 +182,11 @@ class BuildSeeder extends Seeder
                 'build_file' => 'builds/Подводный_дом/underwater_house.nbt',
                 'description' => 'Небольшой дом, который можно разместить прямо под водой. На полу есть вход в подвал, где находится чаровальня. А вход в дом находится сверху.',
                 'difficulty' => 'легкая',
-                'materials' => [],
+                'materials' => [
+                    ['name' => 'камень', 'count' => 256],
+                    ['name' => 'стекло', 'count' => 128],
+                    ['name' => 'призмарин', 'count' => 64],
+                ],
                 'status' => 'active',
                 'images' => [
                     'builds/Подводный_дом/Превью.png',
@@ -162,7 +201,11 @@ class BuildSeeder extends Seeder
                 'build_file' => 'builds/Усадьба_из_Японии/japanese_country_house.nbt',
                 'description' => 'Перед вами японская дача. В её состав входит призмарин, дерево и бетон. Дачу можно разместить в джунглях или в похожем биоме.',
                 'difficulty' => 'обычная',
-                'materials' => [],
+                'materials' => [
+                    ['name' => 'дерево', 'count' => 384],
+                    ['name' => 'призмарин', 'count' => 192],
+                    ['name' => 'бетон', 'count' => 128],
+                ],
                 'status' => 'active',
                 'images' => [
                     'builds/Усадьба_из_Японии/Превью.png',
@@ -178,7 +221,11 @@ class BuildSeeder extends Seeder
                 'build_file' => 'builds/Японский_замок/japanese_castle.schematic',
                 'description' => 'Перед вами японский замок, настоящее архитектурное чудо, связанное с Японией. Замок очень высокий. Внутри он ничем не заполнен, поэтому годится для наружных декораций.',
                 'difficulty' => 'обычная',
-                'materials' => [],
+                'materials' => [
+                    ['name' => 'камень', 'count' => 1536],
+                    ['name' => 'дерево', 'count' => 768],
+                    ['name' => 'призмарин', 'count' => 384],
+                ],
                 'status' => 'active',
                 'images' => [
                     'builds/Японский_замок/Превью.png',
@@ -190,6 +237,7 @@ class BuildSeeder extends Seeder
 
         foreach ($builds as $buildData) {
             $images = $buildData['images'] ?? [];
+            $materials = $buildData['materials'] ?? [];
             unset($buildData['images']);
 
             $build = Build::updateOrCreate(
@@ -199,6 +247,7 @@ class BuildSeeder extends Seeder
                 ],
                 array_merge($buildData, [  //слияние массивов в один
                     'user_id' => $user->id,
+                    'materials' => json_encode($materials),
                 ])
             );
 
@@ -209,7 +258,7 @@ class BuildSeeder extends Seeder
                         'image_path' => $imagePath,
                     ],
                     [
-                        'sort_order' => $index + 1, //порядковый номер
+                        'sort_order' => $index + 1,
                     ]
                 );
             }

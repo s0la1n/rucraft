@@ -187,11 +187,22 @@ export type BuildPost = {
   image?: string | null;
   image_url?: string | null;
   description?: string | null;
+  instructions?: string | null;
   images: string[];
-  blocks: BuildBlock[];
-  file_url?: string | null;
+  blocks?: Array<{ name: string; count: number }>;
+  file_url: string;
   author: ContentAuthor;
   created_at: string;
+  minecraft_version?: string | null;
+  difficulty?: string | null;
+};
+
+export type BuildsIndexResponse = {
+  data: BuildPost[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
 };
 
 export type ModPost = {
@@ -240,8 +251,36 @@ export type ShowResponse<T> = {
 };
 
 export const buildsApi = {
-  index: () => apiFetch<{ data: BuildPost[] }>("builds"),
+  index: (params?: { 
+    page?: number; 
+    difficulty?: string;
+    search?: string;
+  }) => {
+    const q = new URLSearchParams();
+    if (params?.page) q.set("page", String(params.page));
+    if (params?.difficulty) q.set("difficulty", params.difficulty);
+    if (params?.search) q.set("search", params.search);
+    const query = q.toString();
+    return apiFetch<BuildsIndexResponse>(`builds${query ? `?${query}` : ""}`);
+  },
   show: (id: number) => apiFetch<ShowResponse<BuildPost>>(`builds/${id}`),
+
+  create: (formData: FormData) => {
+    const base = getBaseUrl().replace(/\/$/, "");
+    const token = typeof window !== "undefined" ? localStorage.getItem("rucraft_token") : null;
+    return fetch(`${base}/builds`, {
+      method: "POST",
+      headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: formData,
+    }).then(async (res) => {
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error((data as { message?: string }).message ?? String(res.status));
+      return data;
+    });
+  },
+  
+  getDifficulties: () => 
+    apiFetch<{ data: string[] }>('builds/difficulties'),
 };
 
 export const seedsApi = {

@@ -1,0 +1,828 @@
+.builds-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 25px;
+  margin: 30px 0;
+}
+
+@media (min-width: 640px) {
+  .builds-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .builds-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.build-card {
+  border: 5px solid #ffd700;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  height: 550px;
+  width: 100%;
+}
+
+.build-card-image {
+  height: 250px;
+  border-bottom: 5px solid #ffd700;
+  background: #f0f0f0;
+  flex-shrink: 0;
+}
+
+.build-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.build-card-content {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.build-card-title {
+  margin: 0 0 10px 0;
+  font-size: 3rem;
+  font-weight: 600;
+  color: red;
+  text-align: left;
+  flex-shrink: 0;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.build-card-info {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  flex-shrink: 0;
+}
+
+.build-card-author {
+  margin: 0 0 10px 0;
+  font-size: 0.95rem;
+  text-align: right;
+}
+
+.build-card-author strong {
+  color: red;
+}
+
+.build-card-badges {
+  margin-bottom: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #f0f0f0;
+  font-size: 14px;
+}
+
+.build-card-link {
+  display: table;
+  padding: 30px 50px;
+  background: #ff69b4;
+  color: white;
+  text-decoration: none;
+  border: 5px solid #ffd700;
+  border-radius: 50%;
+  transform: scaleX(1.5);
+  margin-top: auto;
+  margin-left: auto;
+  margin-right: auto;
+  white-space: nowrap;
+  transform-origin: center;
+  flex-shrink: 0;
+}
+
+.build-card-link:hover {
+  background: #0056b3;
+}
+
+/* Пагинация */
+.builds-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 40px;
+}
+
+.builds-toolbar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.filters {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.difficulty-group {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.difficulty-label {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.difficulty-options {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.difficulty-btn {
+  background: none;
+  border: none;
+  padding: 5px 0;
+  font-size: 1rem;
+  cursor: pointer;
+  color: white;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.difficulty-btn.active {
+  color: #ff69b4;
+  font-weight: 600;
+  border-bottom-color: #ff69b4;
+  border-bottom-width: 3px;
+}
+
+.search-group {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+}
+
+.search-input {
+  flex: 1;
+  max-width: 100%;
+  min-height: 100px;
+  padding: 10px 45px 10px 10px;
+  font-size: 14px;
+  outline: none;
+}
+
+.search-group::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 80px;
+  background-image: url("data:image/svg+xml,%3Csvg width='46' height='158' viewBox='0 0 46 158' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.8076 79.4882L0.505858 134.414' stroke='black' stroke-width='3'/%3E%3Cpath d='M39.2506 80.8371C37.7531 91.1403 35.3552 97.9839 32.7211 100.788C30.0784 103.601 27.2858 102.29 24.9157 96.8541C22.5454 91.418 20.8631 82.4655 20.155 71.9677C19.4492 61.5038 19.7422 49.8326 21.2397 39.5294C22.7371 29.2262 25.135 22.3825 27.7692 19.5787C30.4118 16.7658 33.2047 18.0772 35.575 23.5133C37.9451 28.9494 39.6272 37.9012 40.3353 48.3987C41.0411 58.8627 40.748 70.5339 39.2506 80.8371Z' stroke='black' stroke-width='3'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.5;
+}
+/* BuildShowPage styles - только для страницы одной постройки */
+.build-show {
+  max-width: 1286px;
+  margin: 0 auto;
+}
+
+.build-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 20px;
+}
+
+.build-author {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.build-author strong {
+  color: red !important;
+}
+
+.build-badges {
+  text-align: right;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  margin-left: 8px;
+  background: #f0f0f0;
+  font-size: 14px;
+}
+
+/* Галерея изображений */
+.build-images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.build-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background: #f0f0f0;
+  border: 3px solid black;
+  overflow: hidden;
+}
+
+.build-image {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.build-image img,
+.build-image video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Описание */
+.build-desc {
+  color: #333 !important;
+  margin: 20px 0;
+  font-size: 1.2rem;
+}
+
+/* Блок ресурсов */
+.build-blocks-section {
+  margin: 30px 0;
+}
+
+.build-blocks-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.blocks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.total-blocks {
+  background: #ff69b4;
+  color: white;
+  padding: 8px 15px;
+  border: 3px solid #ffd700;
+  font-weight: 600;
+}
+
+.total-count {
+  font-size: 1.3rem;
+  margin-left: 8px;
+}
+
+.build-blocks-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.build-block-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f5f5f5;
+  border: 3px solid #333;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.build-block-item.has-recipe {
+  border-color: #ff69b4;
+}
+
+.build-block-item:hover {
+  background: #e0e0e0;
+  border-color: #ff69b4;
+  transform: scale(1.02);
+}
+
+.block-icon {
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 2px solid #333;
+}
+
+.block-info {
+  flex: 1;
+}
+
+.build-block-name {
+  font-weight: 600;
+  font-size: 1rem;
+  display: block;
+}
+
+.build-block-count {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.build-block-craft svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Кнопки действий */
+.build-actions {
+  display: flex;
+  gap: 10px;
+  margin: 30px 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn-instr {
+  width: 259px;
+  height: 54px;
+  background: transparent;
+  color: white;
+  border: 3px solid #ffd700;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-instr:hover {
+  background: rgba(255, 105, 180, 0.3);
+}
+
+/* Инструкция */
+.build-instr {
+  margin-top: 20px;
+  padding: 20px;
+  background: #f0f0f0;
+  border: 3px solid black;
+}
+
+.build-instr p {
+  margin: 10px 0;
+  font-size: 1.1rem;
+  padding-left: 20px;
+  position: relative;
+}
+
+.build-instr p::before {
+  content: "•";
+  color: #ff69b4;
+  font-weight: bold;
+  position: absolute;
+  left: 5px;
+}
+
+/* Медиа-запросы для страницы постройки */
+@media (min-width: 768px) {
+  .build-blocks-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .build-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .build-badges {
+    text-align: left;
+  }
+  
+  .badge {
+    margin-left: 0;
+    margin-right: 8px;
+  }
+  
+  .build-images-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .build-blocks-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .blocks-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .build-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .btn-instr {
+    width: 100%;
+  }
+}
+
+/* Стили для инструкции на странице постройки */
+.build-instructions-section {
+  margin: 20px 0;
+}
+
+.build-instructions-btn {
+  background: #ff69b4;
+  color: white;
+  border: 5px solid #ffd700;
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+}
+
+.build-instructions-btn:hover {
+  background: #ff1493;
+}
+
+.build-instructions-content {
+  margin-top: 15px;
+  padding: 20px;
+  background: #f0f0f0;
+  border: 5px solid #ffd700;
+  font-size: 1.1rem;
+}
+
+.build-instructions-content p {
+  margin: 10px 0;
+  padding-left: 20px;
+  position: relative;
+}
+
+.build-instructions-content p::before {
+  content: "•";
+  color: #ff69b4;
+  font-weight: bold;
+  position: absolute;
+  left: 5px;
+}
+
+/* Craft Modal styles */
+.craft-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.craft-modal-content {
+  background: #8b8b8b;
+  border: 6px solid #c6c6c6;
+  max-width: 600px;
+  width: 90%;
+  padding: 20px;
+  position: relative;
+}
+
+.craft-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #c6c6c6;
+}
+
+.craft-modal-header h3 {
+  margin: 0;
+  color: white;
+  font-size: 1.5rem;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.craft-modal-close {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: white;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #c6c6c6;
+  border: 3px solid #555;
+  border-radius: 0;
+}
+
+.craft-modal-close:hover {
+  background: #ff69b4;
+}
+
+.crafting-table {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.crafting-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 80px);
+  grid-template-rows: repeat(3, 80px);
+  gap: 5px;
+  background: #a0a0a0;
+  padding: 10px;
+  border: 4px solid #555;
+}
+
+.crafting-slot {
+  background: #c6c6c6;
+  border: 3px solid #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.crafting-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.crafting-item-icon svg {
+  width: 40px;
+  height: 40px;
+}
+
+.crafting-item-name {
+  font-size: 0.7rem;
+  text-align: center;
+  position: absolute;
+  bottom: -20px;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 2px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+  display: none;
+}
+
+.crafting-slot:hover .crafting-item-name {
+  display: block;
+}
+
+.crafting-item-count {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.crafting-arrow {
+  font-size: 3rem;
+  color: white;
+  text-shadow: 3px 3px 0 #000;
+}
+
+.crafting-result {
+  background: #a0a0a0;
+  padding: 10px;
+  border: 4px solid #555;
+}
+
+.result-slot {
+  width: 100px;
+  height: 100px;
+}
+
+.craft-no-recipe {
+  color: white;
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 30px;
+}
+
+/* AddBuildModal styles */
+.add-build-modal .modal-content {
+  max-width: 600px !important;
+  width: 90% !important;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.add-build-modal .modal-body {
+  padding: 20px;
+  max-height: calc(90vh - 120px);
+  overflow-y: auto;
+}
+
+/* Стили для материалов */
+.add-build-modal .materials-list {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  padding: 5px;
+  border: 2px solid #c6c6c6;
+  background: #f0f0f0;
+}
+
+.add-build-modal .material-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.add-build-modal .material-name {
+  flex: 2;
+  padding: 8px;
+  border: 2px solid #c6c6c6;
+  background: white;
+}
+
+.add-build-modal .material-count {
+  flex: 1;
+  padding: 8px;
+  border: 2px solid #c6c6c6;
+  width: 70px;
+  background: white;
+}
+
+.add-build-modal .material-remove {
+  width: 36px;
+  height: 36px;
+  background: #ff6b6b;
+  color: white;
+  border: 2px solid #c6c6c6;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-build-modal .material-remove:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.add-build-modal .material-add {
+  background: #4CAF50;
+  color: white;
+  border: 2px solid #c6c6c6;
+  padding: 10px;
+  cursor: pointer;
+  width: 100%;
+  font-weight: 600;
+}
+
+.add-build-modal .material-add:hover {
+  background: #45a049;
+}
+
+/* Стили для версий в одной строке */
+.add-build-modal .version-row {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.add-build-modal .version-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+/* Стили для форм */
+.add-build-modal .form-group {
+  margin-bottom: 15px;
+}
+
+.add-build-modal .form-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: white;
+  font-weight: 500;
+}
+
+.add-build-modal .form-group input,
+.add-build-modal .form-group select,
+.add-build-modal .form-group textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid #c6c6c6;
+  background: white;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.add-build-modal .form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.add-build-modal .form-hint {
+  margin: 5px 0 0;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.8);
+}
+
+/* Стили для кнопок */
+.add-build-modal .modal-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 2px solid #c6c6c6;
+}
+
+.add-build-modal .btn-secondary {
+  padding: 10px 20px;
+  background: transparent;
+  color: white;
+  border: 2px solid #c6c6c6;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.add-build-modal .btn-secondary:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.add-build-modal .btn-submit {
+  padding: 10px 20px;
+  background: #4CAF50;
+  color: white;
+  border: 2px solid #c6c6c6;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.add-build-modal .btn-submit:hover {
+  background: #45a049;
+}
+
+.add-build-modal .btn-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.add-build-modal .form-error {
+  color: #ff6b6b;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: rgba(255,0,0,0.1);
+  border: 2px solid #ff6b6b;
+}
