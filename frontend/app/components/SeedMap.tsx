@@ -531,7 +531,7 @@ export function SeedMap() {
       <div className="seedmap-controls mb-4 flex flex-wrap items-center gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <label className="text-sm">
-            Сид:
+            Сид      :                        
             <input
               type="text"
               value={seedInput}
