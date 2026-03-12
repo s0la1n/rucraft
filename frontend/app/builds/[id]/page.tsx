@@ -9,12 +9,6 @@ import "../builds.css";
 
 // База знаний рецептов
 const CRAFT_RECIPES: Record<string, { result: string, count: number, pattern: string[], ingredients: Record<string, string> }> = {
-  "булыжник": {
-    result: "Булыжник",
-    count: 1,
-    pattern: ["   ", "   ", "   "],
-    ingredients: {}
-  },
   "камень": {
     result: "Камень",
     count: 1,
@@ -45,54 +39,50 @@ const CRAFT_RECIPES: Record<string, { result: string, count: number, pattern: st
     pattern: ["BB ", "BB ", "   "],
     ingredients: { "B": "Песок" }
   },
-  "стекло": {
-    result: "Стекло",
-    count: 1,
-    pattern: ["   ", "   ", "   "],
-    ingredients: {}
-  },
-  "белый бетон": {
-    result: "Белый бетон",
-    count: 1,
-    pattern: ["   ", "   ", "   "],
-    ingredients: {}
-  },
   "пурпурный блок": {
     result: "Пурпурный блок",
     count: 4,
     pattern: ["BF ", "FB ", "   "],
     ingredients: { "B": "Плод коруса", "F": "Огненный стержень" }
   },
-  "призмарин": {
-    result: "Призмарин",
-    count: 1,
-    pattern: ["   ", "   ", "   "],
-    ingredients: {}
-  },
-  "бетон": {
-    result: "Бетон",
-    count: 1,
-    pattern: ["   ", "   ", "   "],
-    ingredients: {}
-  },
-  "дерево": {
-    result: "Дерево",
-    count: 1,
-    pattern: ["   ", "   ", "   "],
-    ingredients: {}
-  },
   "еловые доски": {
     result: "Еловые доски",
     count: 4,
     pattern: ["B  ", "   ", "   "],
     ingredients: { "B": "Еловое бревно" }
-  },
-  "земля": {
-    result: "Земля",
-    count: 1,
-    pattern: ["   ", "   ", "   "],
-    ingredients: {}
   }
+};
+
+// Функция для получения CSS класса иконки
+const getBlockClass = (blockName: string): string => {
+  const map: Record<string, string> = {
+    "камень": "item_1 item_1_0",
+    "булыжник": "item_4 item_4_0",
+    "каменный кирпич": "item_98 item_98_0",
+    "доски": "item_5 item_5_0",
+    "еловые доски": "item_5 item_5_1",
+    "палка": "item_280 item_280_0",
+    "песчаник": "item_24 item_24_0",
+    "стекло": "item_20 item_20_0",
+    "белый бетон": "item_251 item_251_0",
+    "пурпурный блок": "item_201 item_201_0",
+    "призмарин": "item_168 item_168_0",
+    "бетон": "item_251 item_251_0",
+    "дерево": "item_17 item_17_0",
+    "еловое бревно": "item_17 item_17_1",
+    "земля": "item_3 item_3_0",
+    "песок": "item_12 item_12_0",
+    "глина": "item_337 item_337_0",
+    "бревно": "item_17 item_17_0",
+    "плод коруса": "item_432 item_432_0",
+    "огненный стержень": "item_369 item_369_0",
+  };
+  return map[blockName.toLowerCase()] || "item_1 item_1_0";
+};
+
+// Функция для проверки наличия рецепта
+const hasRecipe = (blockName: string): boolean => {
+  return !!CRAFT_RECIPES[blockName.toLowerCase()];
 };
 
 export default function BuildShowPage() {
@@ -101,7 +91,7 @@ export default function BuildShowPage() {
   const [build, setBuild] = useState<BuildPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedBlock, setSelectedBlock] = useState<string | null>(null);
+  const [selectedBlock, setSelectedBlock] = useState<{ name: string, count: number } | null>(null);
   const [showInstructions, setShowInstructions] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -127,7 +117,7 @@ export default function BuildShowPage() {
         setLoading(false);
       });
   }, [id]);
-
+  
   const openModal = (src: string) => {
     setSelectedImage(src);
   };
@@ -136,8 +126,14 @@ export default function BuildShowPage() {
     setSelectedImage(null);
   };
 
-  const openCraft = (blockName: string) => {
-    setSelectedBlock(blockName);
+  const openCraft = (blockName: string, count: number) => {
+    if (hasRecipe(blockName)) {
+      setSelectedBlock({ name: blockName, count });
+    }
+  };
+
+  const closeCraft = () => {
+    setSelectedBlock(null);
   };
 
   const totalBlocks = build?.blocks?.reduce((sum, block) => sum + block.count, 0) || 0;
@@ -208,24 +204,23 @@ export default function BuildShowPage() {
                 
                 <div className="build-blocks-grid">
                   {build.blocks.map((block) => {
-                    const recipe = CRAFT_RECIPES[block.name.toLowerCase()];
-                    const hasRecipe = recipe && Object.keys(recipe.ingredients).length > 0;
+                    const recipeExists = hasRecipe(block.name);
                     
                     return (
                       <div 
                         key={block.name} 
-                        className={`build-block-item ${hasRecipe ? 'has-recipe' : ''}`}
-                        onClick={() => openCraft(block.name)}
+                        className={`build-block-item ${recipeExists ? 'has-recipe' : 'no-recipe'}`}
+                        onClick={() => recipeExists && openCraft(block.name, block.count)}
+                        style={{ cursor: recipeExists ? 'pointer' : 'default' }}
                       >
                         <div className="block-icon">
-                          {/* Здесь можно добавить SVG для списка */}
-                          <span>📦</span>
+                          <span className={`item ${getBlockClass(block.name)}`}></span>
                         </div>
                         <div className="block-info">
                           <span className="build-block-name">{block.name}</span>
                           <span className="build-block-count">{block.count} шт.</span>
                         </div>
-                        {hasRecipe && (
+                        {recipeExists && (
                           <span className="build-block-craft">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                               <rect x="2" y="2" width="20" height="20" stroke="#ff69b4" strokeWidth="2" />
@@ -281,11 +276,15 @@ export default function BuildShowPage() {
         )}
       </PageSection>
       
-      <CraftModal 
-        blockName={selectedBlock} 
-        onClose={() => setSelectedBlock(null)} 
-        recipe={selectedBlock ? CRAFT_RECIPES[selectedBlock.toLowerCase()] : null}
-      />
+      {selectedBlock && (
+        <CraftModal 
+          blockName={selectedBlock.name}
+          requiredCount={selectedBlock.count}
+          onClose={closeCraft} 
+          recipe={CRAFT_RECIPES[selectedBlock.name.toLowerCase()]}
+          getBlockClass={getBlockClass}
+        />
+      )}
     </div>
   );
 }

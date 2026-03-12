@@ -4,6 +4,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { Footer } from "./components/Footer";
 import { Header } from "./components/Header";
 import "./globals.css";
+import "../public/icons/blocks_items.css"; 
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
