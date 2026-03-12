@@ -48,10 +48,7 @@ export default async function Home() {
     <>
       <HeroSlider />
 
-      <main className="mx-auto max-w-6xl px-4 py-8">
-        <BackendStatus />
-      </main>
-
+  
       {/* Блок Постройки: данные из BuildSeeder */}
       <section className="builds-block">
         <h2 className="builds-title">ПОСТРОЙКИ</h2>

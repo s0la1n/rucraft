@@ -48,11 +48,11 @@ export function Header() {
               <span>...</span>
             ) : user ? (
               <>
-                <Link href="/profile" onClick={() => setMenuOpen(false)}>Профиль</Link>
+                <Link className="btn-auth" href="/profile" onClick={() => setMenuOpen(false)}>Профиль</Link>
                 {user.role === "admin" && (
-                  <Link href="/admin" onClick={() => setMenuOpen(false)}>Админ</Link>
+                  <Link className="btn-auth" href="/admin" onClick={() => setMenuOpen(false)}>Админ</Link>
                 )}
-                <button type="button" onClick={() => { setMenuOpen(false); logout(); }}>
+                <button className="btn-auth" type="button" onClick={() => { setMenuOpen(false); logout(); }}>
                   Выход
                 </button>
               </>
