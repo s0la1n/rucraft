@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { PageSection } from "../../components/PageSection";
+import styles from './login.module.css';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
-const ACTION_LOGIN = `${API_BASE}/login`;
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,11 +19,18 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
     setLoading(true);
+    
     const form = e.currentTarget;
     const fd = new FormData(form);
     const loginVal = (fd.get("login") as string)?.trim() ?? "";
     const password = (fd.get("password") as string) ?? "";
+    
     try {
+      // ВАЖНО: сначала получаем CSRF cookie
+      await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+        credentials: 'include'
+      });
+      
       await login(loginVal, password);
       router.replace("/");
       router.refresh();
@@ -35,23 +42,46 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="page-content page-narrow">
-      <PageSection title="Вход">
-        <form action={ACTION_LOGIN} method="post" onSubmit={handleSubmit} className="form-stack">
-          {error && <p className="form-error">{error}</p>}
-          <div className="form-group">
+    <div className={styles.pageContent}>
+      <PageSection title="">
+        <h1 className={styles.sectionTitle}>ВХОД</h1>
+        <form onSubmit={handleSubmit} className={styles.formStack}>
+          {error && <p className={styles.formError}>{error}</p>}
+          
+          <div className={styles.formGroup}>
             <label htmlFor="login">Логин или почта</label>
-            <input id="login" name="login" type="text" autoComplete="username" required placeholder="Логин или email" />
+            <input 
+              id="login" 
+              name="login" 
+              type="text" 
+              autoComplete="username" 
+              required 
+              placeholder="Логин или email" 
+            />
           </div>
-          <div className="form-group">
+          
+          <div className={styles.formGroup}>
             <label htmlFor="password">Пароль</label>
-            <input id="password" name="password" type="password" autoComplete="current-password" required placeholder="Пароль" />
+            <input 
+              id="password" 
+              name="password" 
+              type="password" 
+              autoComplete="current-password" 
+              required 
+              placeholder="Пароль" 
+            />
           </div>
-          <button type="submit" disabled={loading} className="btn-submit">
+          
+          <button 
+            type="submit" 
+            disabled={loading} 
+            className={styles.btnSubmit}
+          >
             {loading ? "Вход…" : "Войти"}
           </button>
         </form>
-        <p className="form-link">
+        
+        <p className={styles.formLink}>
           Нет аккаунта? <Link href="/auth/register">Регистрация</Link>
         </p>
       </PageSection>

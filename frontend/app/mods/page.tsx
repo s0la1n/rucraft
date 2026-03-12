@@ -1,9 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { PageSection } from "../components/PageSection";
-import { modsApi, type ModPost, resolveAssetUrl } from "@/lib/api";
+import { modsApi, type ModPost, type ModsIndexResponse, resolveAssetUrl } from "@/lib/api";
 import { ModsToolbar } from "./ModsToolbar";
-import "./mods.css";
 
 export const metadata = {
   title: "Моды — RuCraft",
@@ -23,11 +22,54 @@ async function getMods(params: {
   search?: string;
 }): Promise<{ data: ModPost[]; current_page: number; last_page: number; total: number; error?: boolean }> {
   try {
-    const res = await modsApi.index(params);
-    return res;
+    // Передаем params в API
+    const response = await modsApi.index(params);
+    
+    // АДАПТЕР: преобразуем ответ API в нужную структуру
+    // Проверяем, что response не undefined и имеет нужную структуру
+    if (response && typeof response === 'object') {
+      // Если response уже имеет структуру ModsIndexResponse
+      if ('data' in response && Array.isArray(response.data)) {
+        return {
+          data: response.data as ModPost[],
+          current_page: (response as any).current_page || 1,
+          last_page: (response as any).last_page || 1,
+          total: (response as any).total || response.data.length,
+          error: false
+        };
+      }
+      
+      // Если response это просто массив модов (на всякий случай)
+      if (Array.isArray(response)) {
+        return {
+          data: response as ModPost[],
+          current_page: 1,
+          last_page: 1,
+          total: response.length,
+          error: false
+        };
+      }
+    }
+    
+    // Если ничего не подошло, возвращаем пустую структуру
+    console.warn("Unexpected API response format:", response);
+    return { 
+      data: [], 
+      current_page: 1, 
+      last_page: 1, 
+      total: 0, 
+      error: true 
+    };
+    
   } catch (err) {
     console.error("Mods fetch failed:", err);
-    return { data: [], current_page: 1, last_page: 1, total: 0, error: true };
+    return { 
+      data: [], 
+      current_page: 1, 
+      last_page: 1, 
+      total: 0, 
+      error: true 
+    };
   }
 }
 
@@ -60,7 +102,6 @@ export default async function ModsPage(props: { searchParams?: SearchParams }) {
     search: search || undefined
   });
   
-  
   const { data: mods, current_page, last_page, error: fetchFailed } = modsData;
 
   return (
@@ -77,25 +118,25 @@ export default async function ModsPage(props: { searchParams?: SearchParams }) {
             <p>Модов пока нет.</p>
           ) : (
             <>
-              <div className="mods-list">
-                {mods.map((mod: ModPost) => {
+              {/* Твои карточки */}
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+                {mods.map((mod) => {
                   const imageSrc =
                     mod.image_url ??
                     resolveAssetUrl(mod.image) ??
                     "/placeholder-mod.png";
                   return (
-                    <article key={mod.id} className="mod-item">
-                      <div className="mod-info">
-                        <div className="mod-header">
-                          <h3 className="mod-title">{mod.title}</h3>
-                          <p className="mod-author">
-                            Автор: <strong>{mod.author.name}</strong>
-                          </p>
-                        </div>
-                        <div className="mod-image">
-                          <img src={imageSrc} alt={mod.title} />
-                        </div>
-                        <div className="mod-badges">
+                    <article key={mod.id} className="card">
+                      <div className="card-image">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={imageSrc} alt={mod.title} />
+                      </div>
+                      <div className="card-body">
+                        <h3 className="card-title">{mod.title}</h3>
+                        <p className="card-meta">
+                          Автор: <strong>{mod.author.name}</strong>
+                        </p>
+                        <div className="mod-badges" style={{ marginBottom: '10px' }}>
                           {mod.version && (
                             <span className="badge">{mod.version}</span>
                           )}
@@ -103,9 +144,9 @@ export default async function ModsPage(props: { searchParams?: SearchParams }) {
                             <span className="badge">MC {mod.minecraft_version}</span>
                           )}
                         </div>
-                        {mod.description && <p className="mod-desc">{mod.description}</p>}
-                        <Link href={`/mods/${mod.id}`} className="btn-download">
-                          gодробнее
+                        {mod.description && <p className="card-text line-clamp-3">{mod.description}</p>}
+                        <Link href={`/mods/${mod.id}`} className="btn-link mt-3 inline-flex">
+                          Подробнее
                         </Link>
                       </div>
                     </article>
@@ -113,6 +154,7 @@ export default async function ModsPage(props: { searchParams?: SearchParams }) {
                 })}
               </div>
 
+              {/* Пагинация */}
               {last_page > 1 && (
                 <nav className="pagination">
                   {current_page > 1 && (

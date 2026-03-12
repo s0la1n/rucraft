@@ -6,7 +6,7 @@ import { skinsApi } from "@/lib/api";
 const CATEGORIES = ["Смешные", "Для девочек", "Для мальчиков", "Аниме", "Мобы", "Милые", "Ютуберы"] as const;
 const MODELS = ["Steve", "Alex"] as const;
 const ALLOWED_TYPES = ["image/png"];
-const MAX_SIZE_MB = 10;
+const MAX_SIZE_MB = 20;
 
 type Props = { open: boolean; onClose: () => void; onSuccess?: () => void };
 
@@ -14,6 +14,7 @@ export function AddSkinModal({ open, onClose, onSuccess }: Props) {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState<string>(CATEGORIES[0]);
   const [model, setModel] = useState<string>(MODELS[0]);
+  const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -58,16 +59,21 @@ export function AddSkinModal({ open, onClose, onSuccess }: Props) {
       formData.set("title", title.trim());
       formData.set("category", category);
       formData.set("model", model);
+      if (description.trim()) formData.set("description", description.trim());
       formData.set("skin_file", file);
-      await skinsApi.create(formData);
+      console.log('[AddSkinModal] Отправка формы:', { title, category, model, description: description.trim(), fileName: file.name, fileSize: file.size });
+      const response = await skinsApi.create(formData);
+      console.log('[AddSkinModal] Ответ сервера:', response);
       setTitle("");
       setCategory(CATEGORIES[0]);
       setModel(MODELS[0]);
+      setDescription("");
       setFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
       onClose();
       onSuccess?.();
     } catch (err) {
+      console.error('[AddSkinModal] Ошибка:', err);
       setError(err instanceof Error ? err.message : "Не удалось добавить скин.");
     } finally {
       setSubmitting(false);
@@ -118,6 +124,17 @@ export function AddSkinModal({ open, onClose, onSuccess }: Props) {
                 </option>
               ))}
             </select>
+          </div>
+          <div className="form-group">
+            <label htmlFor="skin-description">Описание (необязательно)</label>
+            <textarea
+              id="skin-description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              maxLength={1000}
+              placeholder="Опишите ваш скин..."
+              rows={3}
+            />
           </div>
           <div className="form-group">
             <label htmlFor="skin-file">Файл скина (PNG) *</label>

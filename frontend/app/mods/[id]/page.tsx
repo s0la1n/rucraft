@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { PageSection } from "../../components/PageSection";
-import { modsApi, type ModPost, resolveAssetUrl, getBaseUrl } from "@/lib/api";
+import { modsApi, type ModPost, resolveStorageUrl, getBaseUrl } from "@/lib/api";
 import "../mods.css";
 
 export default function ModShowPage() {
@@ -71,7 +71,7 @@ export default function ModShowPage() {
             {mod.images?.length > 0 && (
               <div className="mod-images-grid">
                 {mod.images.map((src) => {
-                  const resolved = resolveAssetUrl(src) ?? src;
+                  const resolved = resolveStorageUrl(src) ?? src;
                   const ext = src.split(".").pop()?.toLowerCase();
                   const isVideo = ext === "mp4" || ext === "webm" || ext === "ogg";
 

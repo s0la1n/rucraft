@@ -5,7 +5,10 @@ import { useState, useEffect } from "react";
 import { modsApi } from "@/lib/api";
 import { useAuth } from "@/app/context/AuthContext";
 import { AddModModal } from "./AddModModal";
-import "./mods.css";
+
+// Статические версии из чужого кода
+const STATIC_VERSIONS = ["java", "bedrock", "forge", "fabric", "quilt"] as const;
+const STATIC_MINECRAFT_VERSIONS = ["1.20", "1.20.1", "1.20.2", "1.20.4", "1.21", "1.21.1"]; // пример
 
 export function ModsToolbar() {
   const router = useRouter();
@@ -17,23 +20,25 @@ export function ModsToolbar() {
   const [version, setVersion] = useState(searchParams.get("version") || "");
   const [minecraftVersion, setMinecraftVersion] = useState(searchParams.get("minecraft_version") || "");
   
-  // Состояния для данных из БД
+  // Состояния для данных
   const [versions, setVersions] = useState<string[]>([]);
   const [minecraftVersions, setMinecraftVersions] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Загружаем версии из БД
+  // Загружаем версии (или используем статические)
   useEffect(() => {
     const loadVersions = async () => {
       try {
-        const [versionsRes, mcVersionsRes] = await Promise.all([
-          modsApi.getVersions(),
-          modsApi.getMinecraftVersions()
-        ]);
-        setVersions(versionsRes.data);
-        setMinecraftVersions(mcVersionsRes.data);
+        // Пробуем получить версии из данных, если есть
+        // Но если API методов нет - сразу используем статику
+        setVersions(STATIC_VERSIONS as unknown as string[]);
+        setMinecraftVersions(STATIC_MINECRAFT_VERSIONS);
+        
+        // TODO: если позже появятся методы в API, можно добавить:
+        // const response = await modsApi.getAll();
+        // извлечь уникальные версии из response.data
       } catch (error) {
-        console.error("Failed to load versions:", error);
+        console.error("Error loading versions:", error);
       } finally {
         setLoading(false);
       }
@@ -55,6 +60,7 @@ export function ModsToolbar() {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
+      // уже обновляется через useEffect
     }
   };
 
@@ -112,16 +118,18 @@ export function ModsToolbar() {
           </div>
         </div>
         
+        {/* Твоя кнопка добавления */}
         {user != null && (
-          <div className="add-button-container" style={{ width: '100%', marginBottom: '15px' }}>
-            <button 
-              type="button" 
-              className="skins-action-btn" 
-              onClick={() => setAddModalOpen(true)}
-              style={{ width: '100%' }}
-            >
-              Добавить мод
-            </button>
+          <div className="skins-toolbar">
+            <div className="skins-actions">
+              <button 
+                type="button" 
+                className="skins-action-btn" 
+                onClick={() => setAddModalOpen(true)}
+              >
+                Добавить
+              </button>
+            </div>
           </div>
         )}
       </div>

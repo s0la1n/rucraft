@@ -1,46 +1,128 @@
 import Link from "next/link";
 import { BackendStatus } from "./components/BackendStatus";
 import { HeroSlider } from "./components/HeroSlider";
+import { Skin3DViewer } from "./skins/Skin3DViewer";
+import {
+  buildsApi,
+  modsApi,
+  seedsApi,
+  skinsApi,
+  type BuildPost,
+  type ModPost,
+  type SeedPost,
+  type SkinPost,
+  resolveAssetUrl,
+  resolveStorageUrl,
+} from "@/lib/api";
 
-export default function Home() {
+async function getHomeData(): Promise<{
+  builds: BuildPost[];
+  mods: ModPost[];
+  seeds: SeedPost[];
+  skins: SkinPost[];
+}> {
+  try {
+    const [buildsRes, modsRes, seedsRes, skinsRes] = await Promise.all([
+      buildsApi.index(),
+      modsApi.index(),
+      seedsApi.index(),
+      skinsApi.index({ page: 1 }),
+    ]);
+
+    return {
+      builds: buildsRes.data.slice(0, 3),
+      mods: modsRes.data.slice(0, 2),
+      seeds: seedsRes.data.slice(0, 1),
+      skins: skinsRes.data.slice(0, 4),
+    };
+  } catch (err) {
+    console.error("Home data fetch failed:", err);
+    return { builds: [], mods: [], seeds: [], skins: [] };
+  }
+}
+
+export default async function Home() {
+  const { builds, mods, seeds, skins } = await getHomeData();
+  const firstSeed = seeds[0];
+
   return (
     <>
+    <div className="home-page">
+      {/* HeroSlider с исправленными кнопками */}
       <HeroSlider />
 
-      <main className="mx-auto max-w-6xl px-4 py-8">
-        <BackendStatus />
-      </main>
-
-      {/* Блок Постройки: 86px от слайдера, заголовок ПОСТРОЙКИ, 3 картинки, кнопка БОЛЬШЕ >>> */}
+      {/* Блок Постройки */}
       <section className="builds-block">
         <h2 className="builds-title">ПОСТРОЙКИ</h2>
         <div className="builds-gallery">
-          <div className="builds-img-wrap builds-img-1">
-            <div className="builds-img-placeholder">Постройка 1</div>
-            <div className="builds-more-wrap">
-              <Link href="/builds" className="builds-more-btn">
-                БОЛЬШЕ &gt;&gt;&gt;
-              </Link>
-            </div>
-          </div>
-          <div className="builds-img-wrap builds-img-2">
-            <div className="builds-img-placeholder">Постройка 2</div>
-          </div>
-          <div className="builds-img-wrap builds-img-3">
-            <div className="builds-img-placeholder">Постройка 3</div>
-          </div>
+          {builds.length === 0 ? (
+            <p className="form-error">Постройки пока не загружены.</p>
+          ) : (
+            builds.map((build, index) => {
+              const imageSrc =
+                build.image_url ?? resolveStorageUrl(build.image) ?? "/placeholder-build.png";
+              const wrapClass =
+                index === 0
+                  ? "builds-img-wrap builds-img-1"
+                  : index === 1
+                  ? "builds-img-wrap builds-img-2"
+                  : "builds-img-wrap builds-img-3";
+
+              return (
+                <div key={build.id} className={wrapClass}>
+                  <Link href={`/builds/${build.id}`} className="builds-img-placeholder">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={imageSrc} alt={build.title} />
+                  </Link>
+                  {index === 0 && (
+                    <div className="builds-more-wrap">
+                      <Link href="/builds" className="builds-more-btn">
+                        БОЛЬШЕ &gt;&gt;&gt;
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
         </div>
       </section>
 
-      {/* Блок cRbys: 70px от построек, 4 карточки 305×440, 2 кнопки в ряд */}
+      {/* Блок cRbys */}
       <section className="skins-block">
         <h2 className="section-title-cyan">cRbys</h2>
         <div className="skins-cards-row">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="skin-card-main">
-              <div className="builds-img-placeholder">Скин {i}</div>
-            </div>
-          ))}
+          {skins.length === 0 ? (
+            <p className="form-error">Скины пока не загружены.</p>
+          ) : (
+            skins.map((skin) => {
+              const imageSrc = skin.file_url ?? "/placeholder-skin.png";
+              
+              return (
+                <div
+                  key={skin.id}
+                  className="skin-card-main"
+                  style={{ cursor: 'default' }}
+                >
+                  <div className="skin-card-image-wrap" style={{ 
+                    width: '100%', 
+                    height: '100%',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}>
+                    <Skin3DViewer 
+                      skinUrl={imageSrc}
+                      title={skin.title}
+                      className="skin-card-canvas"
+                      width={305}
+                      height={440}
+                      autoRotate={true}
+                    />
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
         <div className="skins-buttons-row">
           <Link href="/skins" className="skins-btn-more">
@@ -52,48 +134,105 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Блок СИДЫ: 108px от скинов, слайдер 1283×474, инфо о сиде, кнопка БОЛЬШЕ >>> */}
+      {/* Блок СИДЫ с нормальными стрелками */}
       <section className="seeds-block">
         <h2 className="section-title-cyan">СИДЫ</h2>
         <div className="seeds-slider-wrap">
           <div className="seeds-slider-track">
-            <div className="seeds-slide">
-              <div className="builds-img-placeholder seeds-slide-bg">Слайд сида</div>
-              <div className="seeds-slide-info">
-                <div className="seeds-slide-number">−1234567890123456789</div>
-                <div className="seeds-slide-name">Название сида</div>
-              </div>
-              <div className="seeds-more-wrap">
-                <Link href="/seeds" className="builds-more-btn">
-                  БОЛЬШЕ &gt;&gt;&gt;
+            {firstSeed ? (
+              <div className="seeds-slide">
+                <Link
+                  href={`/seeds/${firstSeed.id}`}
+                  className="builds-img-placeholder seeds-slide-bg"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={
+                      firstSeed.image_url ??
+                      resolveStorageUrl(firstSeed.image) ??
+                      "/placeholder-seed.png"
+                    }
+                    alt={firstSeed.title}
+                  />
                 </Link>
+                <div className="seeds-slide-info">
+                  <div className="seeds-slide-number">{firstSeed.seed}</div>
+                  <div className="seeds-slide-name">{firstSeed.title}</div>
+                </div>
+                <div className="seeds-more-wrap">
+                  <Link href={`/seeds`} className="builds-more-btn">
+                    БОЛЬШЕ &gt;&gt;&gt;
+                  </Link>
+                </div>
               </div>
-            </div>
+            ) : (
+              <p className="form-error">Сиды пока не загружены.</p>
+            )}
           </div>
-          <button type="button" className="seeds-nav-btn prev" aria-label="Предыдущий" />
-          <button type="button" className="seeds-nav-btn next" aria-label="Следующий" />
+          
+          {/* Нормальные стрелки для слайдера сидов */}
+          <button 
+            type="button" 
+            className="seeds-nav-btn prev" 
+            aria-label="Предыдущий"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          
+          <button 
+            type="button" 
+            className="seeds-nav-btn next" 
+            aria-label="Следующий"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
         </div>
       </section>
 
-      {/* Блок моДЫ: 84px от сидов, 2 картинки 1286×393, кнопка на всю ширину */}
+      {/* Блок моДЫ */}
       <section className="mods-block-home">
         <h2 className="section-title-cyan">моДЫ</h2>
         <div className="mods-images-row">
-          <div className="mods-img-wrap">
-            <div className="builds-img-placeholder mods-img-fill">Картинка 1</div>
-            <span className="mods-img-label-left">ХОРРОРЫ</span>
-          </div>
-          <div className="mods-img-wrap">
-            <div className="builds-img-placeholder mods-img-fill">Картинка 2</div>
-            <span className="mods-img-label-right">
-              ИНДУСТР<br />иаль<br />ные
-            </span>
-          </div>
+          {mods.length === 0 ? (
+            <p className="form-error">Моды пока не загружены.</p>
+          ) : (
+            mods.map((mod, index) => {
+              const imageSrc =
+                mod.image_url ?? resolveStorageUrl(mod.image) ?? "/placeholder-mod.png";
+              const labelClass =
+                index === 0 ? "mods-img-label-left" : "mods-img-label-right";
+              const labelText =
+                index === 0 ? (
+                  <>ХОРРОРЫ</>
+                ) : (
+                  <>
+                    ИНДУСТ<br />
+                    иаль<br />
+                    ные
+                  </>
+                );
+
+              return (
+                <div key={mod.id} className="mods-img-wrap">
+                  <Link href={`/mods/${mod.id}`} className="builds-img-placeholder mods-img-fill">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={imageSrc} alt={mod.title} />
+                  </Link>
+                  <span className={labelClass}>{labelText}</span>
+                </div>
+              );
+            })
+          )}
           <Link href="/mods" className="mods-more-full">
             БОЛЬШЕ &gt;&gt;&gt;
           </Link>
         </div>
       </section>
+      </div>
     </>
   );
 }

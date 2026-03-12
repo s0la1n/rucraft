@@ -2,11 +2,13 @@
 
 import { useState, useRef } from "react";
 import { modsApi } from "@/lib/api";
-import "./mods.css";
 
-const VERSIONS = ["java", "bedrock", "forge", "fabric", "quilt"] as const;
+// Объединяем варианты версий
+const VERSIONS = ["java", "bedrock", "forge", "fabric", "quilt", "java_bedrock"] as const;
+const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/jpg"];
 const ALLOWED_EXTENSIONS = [".jar", ".zip"];
-const MAX_SIZE_MB = 50;
+const MAX_IMAGE_SIZE_MB = 20;
+const MAX_FILE_SIZE_MB = 100; // твой лимит больше (100MB против 50MB)
 
 type Props = { open: boolean; onClose: () => void; onSuccess?: () => void };
 
@@ -15,39 +17,70 @@ export function AddModModal({ open, onClose, onSuccess }: Props) {
   const [description, setDescription] = useState("");
   const [version, setVersion] = useState<string>(VERSIONS[0]);
   const [minecraftVersion, setMinecraftVersion] = useState("");
-  const [file, setFile] = useState<File | null>(null);
-  const [images, setImages] = useState<File[]>([]);
+  
+  // Объединяем состояния из обоих подходов
+  const [imageFile, setImageFile] = useState<File | null>(null); // для твоего подхода (одно изображение)
+  const [modFile, setModFile] = useState<File | null>(null); // для файла мода
+  const [additionalImages, setAdditionalImages] = useState<File[]>([]); // для дополнительных изображений (из чужого кода)
+  
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const imagesInputRef = useRef<HTMLInputElement>(null);
+  
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const modInputRef = useRef<HTMLInputElement>(null);
+  const additionalImagesRef = useRef<HTMLInputElement>(null);
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  // Обработка основного изображения (твой подход)
+  function handleImageFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     setError(null);
     if (!f) {
-      setFile(null);
+      setImageFile(null);
+      return;
+    }
+    if (!ALLOWED_IMAGE_TYPES.includes(f.type)) {
+      setError("Разрешён только формат PNG или JPG.");
+      setImageFile(null);
+      e.target.value = "";
+      return;
+    }
+    if (f.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
+      setError(`Размер файла не более ${MAX_IMAGE_SIZE_MB} МБ.`);
+      setImageFile(null);
+      e.target.value = "";
+      return;
+    }
+    setImageFile(f);
+  }
+
+  // Обработка файла мода (объединяем проверки)
+  function handleModFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    setError(null);
+    if (!f) {
+      setModFile(null);
       return;
     }
     
     const fileExt = f.name.substring(f.name.lastIndexOf(".")).toLowerCase();
     if (!ALLOWED_EXTENSIONS.includes(fileExt)) {
       setError("Разрешены только файлы .jar или .zip");
-      setFile(null);
+      setModFile(null);
       e.target.value = "";
       return;
     }
     
-    if (f.size > MAX_SIZE_MB * 1024 * 1024) {
-      setError(`Размер файла не более ${MAX_SIZE_MB} МБ.`);
-      setFile(null);
+    if (f.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      setError(`Размер файла не более ${MAX_FILE_SIZE_MB} МБ.`);
+      setModFile(null);
       e.target.value = "";
       return;
     }
-    setFile(f);
+    setModFile(f);
   }
 
-  function handleImagesChange(e: React.ChangeEvent<HTMLInputElement>) {
+  // Обработка дополнительных изображений (из чужого кода)
+  function handleAdditionalImagesChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
     setError(null);
     
@@ -58,53 +91,91 @@ export function AddModModal({ open, onClose, onSuccess }: Props) {
         continue;
       }
       if (f.size > 5 * 1024 * 1024) {
-        setError("Размер изображения не более 5 МБ.");
+        setError("Размер дополнительного изображения не более 5 МБ.");
         continue;
       }
       validImages.push(f);
     }
     
-    setImages(validImages);
+    setAdditionalImages(validImages);
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
     if (!title.trim()) {
       setError("Введите название мода.");
       return;
     }
-    if (!file) {
-      setError("Выберите файл мода (.jar или .zip).");
+    
+    // Объединяем проверки из обоих подходов
+    if (!description.trim()) {
+      setError("Введите описание мода.");
       return;
     }
     
+    if (!imageFile) {
+      setError("Выберите изображение мода (PNG/JPG).");
+      return;
+    }
+    
+    if (!modFile) {
+      setError("Выберите файл мода (.jar или .zip).");
+      return;
+    }
+
     setSubmitting(true);
     try {
       const formData = new FormData();
       formData.set("title", title.trim());
       formData.set("description", description.trim());
       formData.set("version", version);
-      formData.set("minecraft_version", minecraftVersion);
-      formData.set("mod_file", file);
+      if (minecraftVersion.trim()) {
+        formData.set("minecraft_version", minecraftVersion.trim());
+      }
       
-      images.forEach((img) => {
+      // Основное изображение (твое)
+      formData.set("image_file", imageFile);
+      
+      // Файл мода
+      formData.set("mod_file", modFile);
+      
+      // Дополнительные изображения (из чужого кода)
+      additionalImages.forEach((img) => {
         formData.append("images[]", img);
       });
-      
-      await modsApi.create(formData);
-      
+
+      console.log('[AddModModal] Отправка формы:', { 
+        title, 
+        description: description.trim(), 
+        version, 
+        minecraftVersion: minecraftVersion.trim(),
+        imageFileName: imageFile.name, 
+        modFileName: modFile.name,
+        additionalImagesCount: additionalImages.length
+      });
+
+      const response = await modsApi.create(formData);
+      console.log('[AddModModal] Ответ сервера:', response);
+
+      // Очищаем все состояния
       setTitle("");
       setDescription("");
       setVersion(VERSIONS[0]);
       setMinecraftVersion("");
-      setFile(null);
-      setImages([]);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-      if (imagesInputRef.current) imagesInputRef.current.value = "";
+      setImageFile(null);
+      setModFile(null);
+      setAdditionalImages([]);
+      
+      if (imageInputRef.current) imageInputRef.current.value = "";
+      if (modInputRef.current) modInputRef.current.value = "";
+      if (additionalImagesRef.current) additionalImagesRef.current.value = "";
+      
       onClose();
       onSuccess?.();
     } catch (err) {
+      console.error('[AddModModal] Ошибка:', err);
       setError(err instanceof Error ? err.message : "Не удалось добавить мод.");
     } finally {
       setSubmitting(false);
@@ -137,71 +208,85 @@ export function AddModModal({ open, onClose, onSuccess }: Props) {
               required
             />
           </div>
-          
+
           <div className="form-group">
-            <label htmlFor="mod-description">Описание</label>
+            <label htmlFor="mod-description">Описание *</label>
             <textarea
               id="mod-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Описание мода"
+              maxLength={3000}
+              placeholder="Опишите ваш мод..."
               rows={4}
+              required
             />
           </div>
-          
-          <div className="version-row">
-            <div className="form-group">
-                <label htmlFor="mod-version">Версия мода *</label>
-                <select id="mod-version" value={version} onChange={(e) => setVersion(e.target.value)} required>
-                {VERSIONS.map((v) => (
-                    <option key={v} value={v}>
-                    {v.charAt(0).toUpperCase() + v.slice(1)}
-                    </option>
-                ))}
-                </select>
-            </div>
 
-            <div className="form-group">
-                <label htmlFor="mod-minecraft-version">Версия Minecraft</label>
-                <input
-                id="mod-minecraft-version"
-                type="text"
-                value={minecraftVersion}
-                onChange={(e) => setMinecraftVersion(e.target.value)}
-                placeholder="1.21.1"
-                />
-            </div>
-            </div>
-          
           <div className="form-group">
-            <label htmlFor="mod-file">Файл мода (.jar или .zip) *</label>
+            <label htmlFor="mod-version">Версия *</label>
+            <select id="mod-version" value={version} onChange={(e) => setVersion(e.target.value)} required>
+              {VERSIONS.map((v) => (
+                <option key={v} value={v}>
+                  {v === "java" ? "Java" : v === "bedrock" ? "Bedrock" : v === "java_bedrock" ? "Java + Bedrock" : v.charAt(0).toUpperCase() + v.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="mod-minecraft-version">Версия Minecraft</label>
             <input
-              ref={fileInputRef}
+              id="mod-minecraft-version"
+              type="text"
+              value={minecraftVersion}
+              onChange={(e) => setMinecraftVersion(e.target.value)}
+              maxLength={50}
+              placeholder="Например: 1.20.1"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="mod-image-file">Главное изображение (PNG/JPG) *</label>
+            <input
+              ref={imageInputRef}
+              id="mod-image-file"
+              type="file"
+              accept=".png,.jpg,.jpeg,image/png,image/jpeg"
+              onChange={handleImageFileChange}
+              required={!imageFile}
+            />
+            {imageFile && <p className="form-hint">Выбрано: {imageFile.name}</p>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="mod-file">Файл мода (.jar/.zip) *</label>
+            <input
+              ref={modInputRef}
               id="mod-file"
               type="file"
               accept=".jar,.zip,application/java-archive,application/zip"
-              onChange={handleFileChange}
-              required={!file}
+              onChange={handleModFileChange}
+              required={!modFile}
             />
-            {file && <p className="form-hint">Выбран: {file.name}</p>}
+            {modFile && <p className="form-hint">Выбран: {modFile.name}</p>}
           </div>
-          
+
           <div className="form-group">
-            <label htmlFor="mod-images">Изображения (можно несколько)</label>
+            <label htmlFor="mod-additional-images">Дополнительные изображения</label>
             <input
-              ref={imagesInputRef}
-              id="mod-images"
+              ref={additionalImagesRef}
+              id="mod-additional-images"
               type="file"
               accept="image/*"
               multiple
-              onChange={handleImagesChange}
+              onChange={handleAdditionalImagesChange}
             />
-            {images.length > 0 && (
-              <p className="form-hint">Выбрано: {images.length} изображений</p>
+            {additionalImages.length > 0 && (
+              <p className="form-hint">Выбрано: {additionalImages.length} дополнительных изображений</p>
             )}
             <p className="form-hint">Первое изображение будет превью</p>
           </div>
-          
+
           <div className="modal-footer">
             <button type="button" className="btn-secondary" onClick={onClose}>
               Отмена

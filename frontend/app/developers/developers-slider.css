@@ -1,4 +1,7 @@
-/* developers-slider.css */
+main {
+  margin: 0 auto;
+  max-width: 950px;
+}
 
 .slider-section {
   position: relative;
@@ -6,42 +9,7 @@
   padding: 20px;
 }
 
-.slider-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;
-  align-items: center;
-}
-
-.slider-nav-row {
-  display: flex;
-  gap: 10px;
-}
-
-.slider-nav-btn {
-  width: 50px;
-  height: 50px;
-  border: 2px solid #0a0a0a;
-  background: #22B14C;
-  color: #0a0a0a;
-  font-size: 24px;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
-
-.slider-nav-btn:hover:not(:disabled) {
-  background: #0a0a0a;
-  color: #22B14C;
-  transform: scale(1.1);
-}
-
-.slider-nav-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
+/* Контейнер для слайдера с кнопками внутри */
 .slider-container {
   position: relative;
   width: 100%;
@@ -49,6 +17,99 @@
   margin: 0 auto;
   min-height: 400px;
 }
+
+/* Контейнер для кнопок внутри слайдера */
+.slider-nav-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Ряды кнопок */
+.slider-nav-row {
+  position: absolute;
+  display: flex;
+  gap: 10px;
+  pointer-events: none;
+}
+
+/* Горизонтальные кнопки (влево/вправо) */
+.slider-nav-row.horizontal {
+  top: 50%;
+  transform: translateY(-50%);
+  width: 98%;
+  justify-content: space-between;
+  padding: 0 20px; 
+}
+
+/* Верхняя кнопка (вверх) */
+.slider-nav-row.top {
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Нижняя кнопка (вниз) */
+.slider-nav-row.bottom {
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Сами кнопки */
+.slider-nav-btn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  padding-right: 20px;
+}
+
+/* Стили для картинок внутри кнопок */
+.slider-nav-btn img {
+  width: 64px;
+  height: 64px;
+  transition: filter 0.3s ease;
+}
+
+.slider-nav-btn:hover:not(:disabled) {
+  transform: scale(1.4);
+  opacity: 1;
+}
+
+.slider-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: auto;
+}
+
+/* Поворот картинок в зависимости от направления */
+.slider-nav-btn.left img {
+  transform: rotate(180deg);
+}
+.slider-nav-btn.right img {
+  transform: rotate(0deg);
+}
+.slider-nav-btn.up img {
+  transform: rotate(-90deg);
+}
+.slider-nav-btn.down img {
+  transform: rotate(90deg);
+}
+
 
 .slide-wrapper {
   position: relative;
@@ -61,7 +122,7 @@
 
 .slide-image {
   width: 100%;
-  height: auto;
+  height: 500px;
   display: block;
   border-radius: 12px;
 }
@@ -242,16 +303,7 @@
   100% { opacity: 1; }
 }
 
-/* Счётчик слайдов */
-.slide-counter {
-  text-align: center;
-  margin-top: 20px;
-  font-size: 18px;
-  font-weight: 500;
-  color: #0a0a0a;
-}
-
-/* Стили для карточек разработчиков - обновлено для горизонтального расположения */
+/* Стили для карточек разработчиков */
 .developers-section {
   display: flex;
   flex-direction: column;
@@ -263,8 +315,12 @@
 
 .developer-card {
   display: flex;
+  align-items: center;
   gap: 24px;
   padding: 20px;
+}
+.developer-card-reverse {
+  flex-direction: row-reverse;
 }
 
 .developer-skin {
@@ -294,11 +350,11 @@
 .developer-info h3 {
   margin: 0;
   font-size: 1.5rem;
-  color: #0a0a0a;
+  color: #fff;
 }
 
 .developer-role {
-  color: #fff;
+  color: #B5E61D;
   font-weight: 600;
   margin: 0;
   font-size: 1.1rem;
@@ -312,6 +368,7 @@
 
 .developer-social {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   margin: 4px 0;
   padding: 8px 0;
@@ -322,17 +379,17 @@
 }
 
 .social-link a {
-  color: #0a0a0a;
+  color: #22B14C;
   text-decoration: none;
   font-weight: 500;
   padding: 4px 12px;
-  background: #e0e0e0;
+  background: #fff;
   border-radius: 20px;
   transition: all 0.2s ease;
 }
 
 .social-link a:hover {
-  background: #fff;
+  background: #e4e4e4;
   text-decoration: none;
 }
 
@@ -350,5 +407,28 @@
   
   .developer-social {
     justify-content: center;
+  }
+
+  .slider-nav-btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+  }
+
+  .slider-nav-btn img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .slider-nav-row.horizontal {
+    padding: 0 10px;
+  }
+
+  .slider-nav-row.top {
+    top: 10px;
+  }
+
+  .slider-nav-row.bottom {
+    bottom: 10px;
   }
 }

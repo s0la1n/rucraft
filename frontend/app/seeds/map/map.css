@@ -1,0 +1,236 @@
+.seed-map-container {
+    position: relative;
+    width: 100%;
+    height: 500px; 
+  }
+  
+  .map-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+  
+  .markers-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none; /* Позволяет кликать сквозь метки если нужно */
+  }
+  
+  .marker {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 11;
+    pointer-events: auto; /* Возвращаем события для конкретных меток */
+  }
+
+  /* Информация под картой - новая компоновка */
+.seedmap-info {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #e5e7eb;
+}
+
+/* Левая колонка - информация с курсора */
+.seedmap-cursor-info {
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  border-left: 3px solid #3b82f6;
+}
+
+.seedmap-cursor-info h3 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9ca3af;
+  margin-bottom: 0.5rem;
+}
+
+.seedmap-cursor-info .biom-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #fbbf24;
+  margin-bottom: 0.5rem;
+}
+
+.seedmap-cursor-info .coordinates {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.seedmap-cursor-info .coordinates span {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-family: monospace;
+}
+
+.seedmap-cursor-info .chunk {
+  color: #9ca3af;
+  font-size: 0.75rem;
+  font-family: monospace;
+}
+
+/* Правая колонка - информация о выбранной метке */
+.seedmap-structure-info {
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  border-left: 3px solid #f59e0b;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+}
+
+.seedmap-structure-info h3 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9ca3af;
+  margin-bottom: 0.5rem;
+}
+
+.seedmap-structure-info .structure-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #f59e0b;
+  margin-bottom: 0.5rem;
+}
+
+.seedmap-structure-info .structure-coordinates {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.seedmap-structure-info .structure-coordinates span {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-family: monospace;
+}
+
+.seedmap-structure-info .structure-chunk {
+  color: #9ca3af;
+  font-size: 0.75rem;
+  font-family: monospace;
+}
+
+.seedmap-structure-info .no-selection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #6b7280;
+  font-style: italic;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+/* Нижний блок - легенда биомов и структур */
+.seedmap-legend {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  font-size: 0.75rem;
+}
+
+.seedmap-biomes-block,
+.seedmap-structures-block {
+  background-color: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+}
+
+.seedmap-biomes-block h4,
+.seedmap-structures-block h4 {
+  font-weight: 600;
+  color: #d1d5db;
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.25rem;
+}
+
+.seedmap-biome-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .seedmap-biome-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.seedmap-biome-item {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.7rem;
+}
+
+.seedmap-biome-color {
+  display: inline-block;
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: 0.25rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.seedmap-structure-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+}
+
+.seedmap-structure-item {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.7rem;
+}
+
+.seedmap-structure-icon {
+  width: 1rem;
+  height: 1rem;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+/* Состояние загрузки/пустые состояния */
+.seedmap-info .empty-state {
+  color: #6b7280;
+  font-style: italic;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+  .seedmap-info {
+    grid-template-columns: 1fr;
+  }
+  
+  .seedmap-legend {
+    grid-template-columns: 1fr;
+  }
+}

@@ -5,6 +5,7 @@ import { RequireAuth } from "../components/RequireAuth";
 import { PageSection } from "../components/PageSection";
 
 const adminTabs = [
+  { href: "/admin/analytics", label: "Аналитика" },
   { href: "/admin/skins", label: "Скины" },
   { href: "/admin/builds", label: "Постройки" },
   { href: "/admin/mods", label: "Моды" },

@@ -1,14 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { RequireAuth } from "../components/RequireAuth";
-import { PageSection } from "../components/PageSection";
 import { profileApi } from "@/lib/api";
+import { useAuth } from "../context/AuthContext";
+import "./profile.css";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
 const ACTION_PROFILE = `${API_BASE}/profile`;
 
 export default function ProfilePage() {
+  const router = useRouter();
+  const { logout } = useAuth();
+
   const [name, setName] = useState("");
   const [login, setLogin] = useState("");
   const [email, setEmail] = useState("");
@@ -52,39 +57,61 @@ export default function ProfilePage() {
     }
   }
 
+  async function handleLogout() {
+    try {
+      await logout(); // вызывает AuthController.logout в api
+    } finally {
+      router.replace("/auth/login");
+      router.refresh();
+    }
+  }
+
   return (
     <RequireAuth>
-      <div className="page-content page-narrow">
-        <PageSection title="Профиль">
-          {loadError && <p className="form-error">{loadError}</p>}
-          <form action={ACTION_PROFILE} method="post" onSubmit={handleSubmit} className="form-stack">
-            {saveError && <p className="form-error">{saveError}</p>}
-            {success && <p className="form-success">Профиль сохранён.</p>}
-            <div className="form-group">
-              <label htmlFor="name">Имя</label>
-              <input id="name" name="name" type="text" value={name} onChange={(e) => setName(e.target.value)} />
+      <div className="profile-main">
+        <h2>Профиль</h2>
+
+        <div className="profile-layout">
+
+          <div className="profile-card">
+            <div className="profile-card-info">
+              <div className="profile-labels">
+                <span>Ник:</span>
+                <span>Логин:</span>
+                <span>Почта:</span>
+              </div>
+              <div className="profile-values">
+                <span>{name}</span>
+                <span>{login}</span>
+                <span>{email}</span>
+              </div>
             </div>
-            <div className="form-group">
-              <label htmlFor="login">Логин</label>
-              <input id="login" name="login" type="text" value={login} onChange={(e) => setLogin(e.target.value)} />
-            </div>
-            <div className="form-group">
-              <label htmlFor="email">Почта</label>
-              <input id="email" name="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-            </div>
-            <div className="form-group">
-              <label htmlFor="password">Новый пароль (оставьте пустым, чтобы не менять)</label>
-              <input id="password" name="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-            </div>
-            <div className="form-group">
-              <label htmlFor="password_confirmation">Повтор пароля</label>
-              <input id="password_confirmation" name="password_confirmation" type="password" value={passwordConfirmation} onChange={(e) => setPasswordConfirmation(e.target.value)} />
-            </div>
-            <button type="submit" disabled={loading} className="btn-submit">
-              {loading ? "Сохранение…" : "Сохранить"}
-            </button>
-          </form>
-        </PageSection>
+
+            <form action={ACTION_PROFILE} method="post" onSubmit={handleSubmit} className="profile-form">
+              {loadError && <p className="profile-error">{loadError}</p>}
+              {saveError && <p className="profile-error">{saveError}</p>}
+              {success && <p className="profile-success">Профиль сохранён.</p>}
+
+              <div className="profile-inputs">
+                <input id="name" name="name" type="text" placeholder="Имя" value={name} onChange={(e) => setName(e.target.value)} />
+                <input id="login" name="login" type="text" placeholder="Логин" value={login} onChange={(e) => setLogin(e.target.value)} />
+                <input id="email" name="email" type="email" placeholder="Почта" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <input id="password" name="password" type="password" placeholder="Новый пароль" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <input id="password_confirmation" name="password_confirmation" type="password" placeholder="Повтор пароля" value={passwordConfirmation} onChange={(e) => setPasswordConfirmation(e.target.value)} />
+              </div>
+
+              <button type="submit" disabled={loading} className="profile-save-btn">
+                {loading ? "Сохранение…" : "Сохранить"}
+              </button>
+            </form>
+          </div>
+
+          <div className="profile-photo">
+            <img src="/profile/свага.png" alt="Мем 1" className="photo" />
+          </div>
+        </div>
+        
+        <button type="button" className="profile-exit-btn" onClick={handleLogout}>ВЫЙТИ</button>
       </div>
     </RequireAuth>
   );
