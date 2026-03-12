@@ -8,7 +8,6 @@ import { PageSection } from "../../components/PageSection";
 import styles from './login.module.css';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
-const ACTION_LOGIN = `${API_BASE}/login`;
 
 export default function LoginPage() {
   const router = useRouter();
@@ -20,11 +19,18 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
     setLoading(true);
+    
     const form = e.currentTarget;
     const fd = new FormData(form);
     const loginVal = (fd.get("login") as string)?.trim() ?? "";
     const password = (fd.get("password") as string) ?? "";
+    
     try {
+      // ВАЖНО: сначала получаем CSRF cookie
+      await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+        credentials: 'include'
+      });
+      
       await login(loginVal, password);
       router.replace("/");
       router.refresh();
@@ -39,7 +45,7 @@ export default function LoginPage() {
     <div className={styles.pageContent}>
       <PageSection title="">
         <h1 className={styles.sectionTitle}>ВХОД</h1>
-        <form action={ACTION_LOGIN} method="post" onSubmit={handleSubmit} className={styles.formStack}>
+        <form onSubmit={handleSubmit} className={styles.formStack}>
           {error && <p className={styles.formError}>{error}</p>}
           
           <div className={styles.formGroup}>
