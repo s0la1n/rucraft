@@ -3,11 +3,15 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { modsApi } from "@/lib/api";
+import { useAuth } from "@/app/context/AuthContext";
+import { AddModModal } from "./AddModModal";
 import "./mods.css";
 
 export function ModsToolbar() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user } = useAuth();
+  const [addModalOpen, setAddModalOpen] = useState(false);
   
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [version, setVersion] = useState(searchParams.get("version") || "");
@@ -55,57 +59,73 @@ export function ModsToolbar() {
   };
 
   return (
-    <div className="mods-toolbar">
-      <div className="filters">
-        <div className="filter-group search-group">
-          <input
-            id="search"
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="поискать"
-            className="search-input"
-          />
-        </div>
-        <div className="filter-version">
-          <div className="filter-group">
-            <label htmlFor="version" className="block text-sm font-medium mb-1">Ядро</label>
-            <select 
-              id="version"
-              value={version} 
-              onChange={(e) => setVersion(e.target.value)}
-              className="version-input"
-              disabled={loading}
-            >
-              <option value="">Все версии</option>
-              {versions.map((v) => (
-                <option key={v} value={v}>
-                  {v.charAt(0).toUpperCase() + v.slice(1)}
-                </option>
-              ))}
-            </select>
+    <>
+      <div className="mods-toolbar">
+        <div className="filters">
+          <div className="filter-group search-group">
+            <input
+              id="search"
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="поискать"
+              className="search-input"
+            />
           </div>
+          <div className="filter-version">
+            <div className="filter-group">
+              <label htmlFor="version" className="block text-sm font-medium mb-1">Ядро</label>
+              <select 
+                id="version"
+                value={version} 
+                onChange={(e) => setVersion(e.target.value)}
+                className="version-input"
+                disabled={loading}
+              >
+                <option value="">Все версии</option>
+                {versions.map((v) => (
+                  <option key={v} value={v}>
+                    {v.charAt(0).toUpperCase() + v.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div className="filter-group">
-            <label htmlFor="minecraft" className="block text-sm font-medium mb-1">Версия</label>
-            <select 
-              id="minecraft"
-              value={minecraftVersion} 
-              onChange={(e) => setMinecraftVersion(e.target.value)}
-              className="version-input"
-              disabled={loading}
-            >
-              <option value="">Все версии</option>
-              {minecraftVersions.map((v) => (
-                <option key={v} value={v}>
-                  {v}
-                </option>
-              ))}
-            </select>
+            <div className="filter-group">
+              <label htmlFor="minecraft" className="block text-sm font-medium mb-1">Версия</label>
+              <select 
+                id="minecraft"
+                value={minecraftVersion} 
+                onChange={(e) => setMinecraftVersion(e.target.value)}
+                className="version-input"
+                disabled={loading}
+              >
+                <option value="">Все версии</option>
+                {minecraftVersions.map((v) => (
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
+        
+        {user != null && (
+          <div className="add-button-container" style={{ width: '100%', marginBottom: '15px' }}>
+            <button 
+              type="button" 
+              className="skins-action-btn" 
+              onClick={() => setAddModalOpen(true)}
+              style={{ width: '100%' }}
+            >
+              Добавить мод
+            </button>
+          </div>
+        )}
       </div>
-    </div>
+      <AddModModal open={addModalOpen} onClose={() => setAddModalOpen(false)} onSuccess={() => router.refresh()} />
+    </>
   );
 }

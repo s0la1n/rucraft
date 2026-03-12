@@ -455,6 +455,20 @@ export const modsApi = {
     return apiFetch<ModsIndexResponse>(`mods${query ? `?${query}` : ""}`);
   },
   show: (id: number) => apiFetch<ShowResponse<ModPost>>(`mods/${id}`),
+
+  create: (formData: FormData) => {
+    const base = getBaseUrl().replace(/\/$/, "");
+    const token = typeof window !== "undefined" ? localStorage.getItem("rucraft_token") : null;
+    return fetch(`${base}/mods`, {
+      method: "POST",
+      headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: formData,
+    }).then(async (res) => {
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error((data as { message?: string }).message ?? String(res.status));
+      return data;
+    });
+  },
   
   getVersions: () => 
     apiFetch<{ data: string[] }>('mods/versions'),

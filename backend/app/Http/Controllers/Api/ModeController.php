@@ -104,6 +104,62 @@ class ModeController extends Controller
         ]);
     }
 
+    public function store(Request $request): JsonResponse
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'version' => 'required|string|max:50',
+            'minecraft_version' => 'nullable|string|max:50',
+            'mod_file' => 'required|file|mimes:jar,zip|max:51200',
+            'images' => 'nullable|array',
+            'images.*' => 'image|max:5120', // каждое изображение до 5МБ
+        ]);
+
+        $mod = new Mode();
+        $mod->title = $request->title;
+        $mod->description = $request->description;
+        $mod->version = $request->version;
+        $mod->minecraft_version = $request->minecraft_version;
+        $mod->user_id = auth()->id();
+        $mod->status = 'active';
+
+        if ($request->hasFile('mod_file')) {
+            $path = $request->file('mod_file')->store('mods', 'public');
+            $mod->mod_file = $path;
+        }
+
+        $mod->save();
+
+        // Сохраняем все изображения
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $index => $image) {
+                $path = $image->store('mods', 'public');
+                
+                // Первое изображение сохраняем как превью в поле image
+                if ($index === 0) {
+                    $mod->image = $path;
+                    $mod->save();
+                }
+                
+                // Все изображения сохраняем в mode_images
+                $mod->images()->create([
+                    'image_path' => $path,
+                    'sort_order' => $index,
+                ]);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Мод успешно добавлен',
+            'data' => [
+                'id' => $mod->id,
+                'title' => $mod->title,
+                'images_count' => $mod->images()->count(),
+            ]
+        ], 201);
+    }
+
     public function downloadFile(Mode $mode)
     {
         $path = $mode->mod_file;

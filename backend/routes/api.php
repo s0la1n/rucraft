@@ -29,6 +29,7 @@ Route::get('/builds/{build}/download', [BuildController::class, 'downloadFile'])
 
 Route::prefix('mods')->group(function () {
     Route::get('/', [ModeController::class, 'index']);
+    Route::post('/', [ModeController::class, 'store'])->middleware('auth:sanctum');
     Route::get('/versions', [ModeController::class, 'versions']);
     Route::get('/minecraft-versions', [ModeController::class, 'minecraftVersions']);
     Route::get('/{mode}', [ModeController::class, 'show']);
