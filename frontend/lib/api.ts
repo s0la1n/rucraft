@@ -464,9 +464,17 @@ export type SeedPost = {
   seed: string;
   version: "java" | "bedrock" | "both";
   release: string;
-  x: number;
-  y: number;
-  z: number;
+  // Добавляем поле coordinates как массив
+  coordinates?: Array<{
+    name: string;
+    x: number;
+    y: number;
+    z: number;
+  }> | null;
+  // Для обратной совместимости оставляем x,y,z
+  x?: number;
+  y?: number;
+  z?: number;
   author: ContentAuthor;
   created_at: string;
 };

@@ -46,7 +46,7 @@ class SeedController extends Controller
             $imageFilename = uniqid() . '_' . $imageFile->getClientOriginalName();
             $imagePath = $imageFile->storeAs('seeds', $imageFilename, 'public');
 
-            // Формирование координат
+            // Формирование координат (для обратной совместимости)
             $coordinates = [
                 'x' => (float) ($validated['x'] ?? 0),
                 'y' => (float) ($validated['y'] ?? 0),
@@ -61,7 +61,7 @@ class SeedController extends Controller
                 'version' => $validated['version'],
                 'minecraft_release' => $validated['minecraft_release'],
                 'description' => $validated['description'] ?? null,
-                'coordinates' => $coordinates,
+                'coordinates' => $coordinates, // Это для модерации
                 'image' => $imagePath,
                 'status' => 'pending',
             ]);
@@ -130,7 +130,27 @@ class SeedController extends Controller
     {
         $seed->load(['user', 'images']);
 
-        $coordinates = $seed->coordinates ?? [];
+        // 🔥 ВАЖНО: Парсим координаты из JSON строки в массив
+        $coordinates = [];
+        if ($seed->coordinates) {
+            // Проверяем, является ли строка JSON массивом
+            $decoded = json_decode($seed->coordinates, true);
+            if (is_array($decoded)) {
+                // Проверяем, массив ли это объектов с именами
+                if (isset($decoded[0]) && isset($decoded[0]['name'])) {
+                    // Это уже массив координат с именами
+                    $coordinates = $decoded;
+                } else {
+                    // Это одиночные координаты, преобразуем в массив с дефолтным именем
+                    $coordinates = [[
+                        'name' => 'Основная точка',
+                        'x' => (float) ($decoded['x'] ?? 0),
+                        'y' => (float) ($decoded['y'] ?? 0),
+                        'z' => (float) ($decoded['z'] ?? 0),
+                    ]];
+                }
+            }
+        }
 
         return response()->json([
             'data' => [
@@ -139,11 +159,14 @@ class SeedController extends Controller
                 'seed' => $seed->seed_number,
                 'version' => $seed->version,
                 'release' => $seed->minecraft_release,
+                // 🔥 Отправляем массив координат
+                'coordinates' => $coordinates,
                 // все изображения сида из таблицы seed_images
                 'images' => $seed->images->pluck('image_path')->values(),
-                'x' => (float) ($coordinates['x'] ?? 0),
-                'y' => (float) ($coordinates['y'] ?? 0),
-                'z' => (float) ($coordinates['z'] ?? 0),
+                // Для обратной совместимости оставляем x,y,z
+                'x' => $coordinates[0]['x'] ?? 0,
+                'y' => $coordinates[0]['y'] ?? 0,
+                'z' => $coordinates[0]['z'] ?? 0,
                 'author' => [
                     'id' => $seed->user?->id,
                     'name' => $seed->user?->name ?? 'Неизвестный автор',
@@ -153,4 +176,3 @@ class SeedController extends Controller
         ]);
     }
 }
-
