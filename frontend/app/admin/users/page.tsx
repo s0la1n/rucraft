@@ -5,6 +5,7 @@ import Link from "next/link";
 import { RequireAuth } from "../../components/RequireAuth";
 import { PageSection } from "../../components/PageSection";
 import { adminApi } from "@/lib/api";
+import "../admin.css";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
 

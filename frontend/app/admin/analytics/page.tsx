@@ -19,6 +19,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import "../admin.css";
 
 const COLORS = [
   "#FF0000",
