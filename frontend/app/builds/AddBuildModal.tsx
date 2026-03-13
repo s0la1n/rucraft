@@ -146,18 +146,18 @@ export function AddBuildModal({ open, onClose, onSuccess }: Props) {
   if (!open) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="add-build-title">
-      <div className="modal-content add-build-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
+    <div className="build-modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="add-build-title">
+      <div className="build-modal-content add-build-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="build-modal-header">
           <h2 id="add-build-title">Добавить постройку</h2>
-          <button type="button" className="modal-close" onClick={onClose} aria-label="Закрыть">
+          <button type="button" className="build-modal-close" onClick={onClose} aria-label="Закрыть">
             ×
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="modal-body">
-          {error && <p className="form-error">{error}</p>}
-          
-          <div className="form-group">
+        <form onSubmit={handleSubmit} className="build-modal-body">
+          {error && <p className="build-form-error">{error}</p>}
+
+          <div className="build-form-group">
             <label htmlFor="build-title">Название *</label>
             <input
               id="build-title"
@@ -170,7 +170,7 @@ export function AddBuildModal({ open, onClose, onSuccess }: Props) {
             />
           </div>
 
-          <div className="form-group">
+          <div className="build-form-group">
             <label htmlFor="build-minecraft-version">Версия Minecraft *</label>
             <input
               id="build-minecraft-version"
@@ -183,7 +183,7 @@ export function AddBuildModal({ open, onClose, onSuccess }: Props) {
             />
           </div>
 
-          <div className="form-group">
+          <div className="build-form-group">
             <label htmlFor="build-difficulty">Сложность *</label>
             <select id="build-difficulty" value={difficulty} onChange={(e) => setDifficulty(e.target.value)} required>
               {DIFFICULTIES.map((d) => (
@@ -194,7 +194,7 @@ export function AddBuildModal({ open, onClose, onSuccess }: Props) {
             </select>
           </div>
 
-          <div className="form-group">
+          <div className="build-form-group">
             <label htmlFor="build-description">Описание (необязательно)</label>
             <textarea
               id="build-description"
@@ -206,7 +206,7 @@ export function AddBuildModal({ open, onClose, onSuccess }: Props) {
             />
           </div>
 
-          <div className="form-group">
+          <div className="build-form-group">
             <label>Материалы (необязательно)</label>
             <div className="materials-list">
               {materials.map((material, index) => (
@@ -241,7 +241,7 @@ export function AddBuildModal({ open, onClose, onSuccess }: Props) {
             </button>
           </div>
 
-          <div className="form-group">
+          <div className="build-form-group">
             <label htmlFor="build-image-file">Изображение (PNG/JPG) *</label>
             <input
               ref={imageInputRef}
@@ -251,10 +251,10 @@ export function AddBuildModal({ open, onClose, onSuccess }: Props) {
               onChange={handleImageFileChange}
               required={!imageFile}
             />
-            {imageFile && <p className="form-hint">Выбран: {imageFile.name}</p>}
+            {imageFile && <p className="build-form-hint">Выбран: {imageFile.name}</p>}
           </div>
 
-          <div className="form-group">
+          <div className="build-form-group">
             <label htmlFor="build-file">Файл постройки (необязательно)</label>
             <input
               ref={buildInputRef}
@@ -263,14 +263,14 @@ export function AddBuildModal({ open, onClose, onSuccess }: Props) {
               accept=".zip,.rar,.schem,.litematic"
               onChange={handleBuildFileChange}
             />
-            {buildFile && <p className="form-hint">Выбран: {buildFile.name}</p>}
+            {buildFile && <p className="build-form-hint">Выбран: {buildFile.name}</p>}
           </div>
 
-          <div className="modal-footer">
-            <button type="button" className="btn-secondary" onClick={onClose}>
+          <div className="build-modal-footer">
+            <button type="button" className="build-btn-secondary-modal" onClick={onClose}>
               Отмена
             </button>
-            <button type="submit" className="btn-submit" disabled={submitting}>
+            <button type="submit" className="build-btn-submit" disabled={submitting}>
               {submitting ? "Отправка…" : "Добавить"}
             </button>
           </div>

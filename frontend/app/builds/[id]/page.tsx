@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { PageSection } from "../../components/PageSection";
 import { buildsApi, type BuildPost, resolveStorageUrl, getBaseUrl } from "@/lib/api";
 import { CraftModal } from "./CraftModal";
+import "../builds.css";
 
 // База знаний рецептов
 const CRAFT_RECIPES: Record<string, { result: string, count: number, pattern: string[], ingredients: Record<string, string> }> = {
@@ -129,95 +130,116 @@ export default function BuildShowPage() {
   return (
     <div className="page-content">
       <PageSection title={build ? build.title : "Постройка"}>
-        {loading && <p>Загрузка…</p>}
-        {error && <p className="form-error">{error}</p>}
-        {!loading && !error && build && (
-          <div className="space-y-4">
-            <p>
-              Автор: <strong>{build.author.name}</strong>
-            </p>
-            {build.description && <p>{build.description}</p>}
-            {build.images?.length > 0 && (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {build.images.map((src) => {
-                  const resolved = resolveStorageUrl(src) ?? src;
-                  return (
-                    <div key={src} className="overflow-hidden rounded-xl bg-zinc-200 dark:bg-zinc-700">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={resolved} alt={build.title} className="h-full w-full object-cover" />
-                    </div>
-                  );
-                })}
+        <div className="build-show-page">
+          {loading && <p>Загрузка…</p>}
+          {error && <p className="form-error">{error}</p>}
+          {!loading && !error && build && (
+            <div className="space-y-4">
+              <div className="build-show-header">
+                <h1 className="build-show-title">{build.title}</h1>
+                <p className="build-show-author">
+                  Автор: <strong>{build.author.name}</strong>
+                </p>
               </div>
-            )}
-            
-            {build.blocks?.length > 0 && (
-              <div className="build-blocks-section">
-                <h3 className="mb-2 font-semibold">Необходимые ресурсы</h3>
-                <div className="build-blocks-grid">
-                  {build.blocks.map((block) => {
-                    const recipeExists = hasRecipe(block.name);
-                    
+
+              {build.description && <p className="build-show-description">{build.description}</p>}
+
+              {build.images?.length > 0 && (
+                <div className="build-show-images">
+                  {build.images.map((src) => {
+                    const resolved = resolveStorageUrl(src) ?? src;
+                    const ext = src.split(".").pop()?.toLowerCase();
+                    const isVideo = ext === "mp4" || ext === "webm" || ext === "ogg";
+
                     return (
-                      <div 
-                        key={block.name} 
-                        className={`build-block-item ${recipeExists ? 'has-recipe' : ''}`}
-                        onClick={() => recipeExists && openCraft(block.name, block.count)}
-                        style={{ cursor: recipeExists ? 'pointer' : 'default' }}
+                      <div
+                        key={src}
+                        className="build-show-image"
+                        style={{ "--rot": `${(Math.random() - 0.5) * 4}deg` } as React.CSSProperties}
                       >
-                        <div className="block-icon">
-                          <span className={`item ${getBlockClass(block.name)}`}></span>
-                        </div>
-                        <div className="block-info">
-                          <span className="build-block-name">{block.name}</span>
-                          <span className="build-block-count">{block.count} шт.</span>
-                        </div>
-                        {recipeExists && (
-                          <span className="build-block-craft">[?]</span>
+                        {isVideo ? (
+                          <video
+                            src={resolved}
+                            controls
+                            preload="metadata"
+                          />
+                        ) : (
+                          <img src={resolved} alt={build.title} />
                         )}
                       </div>
                     );
                   })}
                 </div>
-              </div>
-            )}
-            
-            {build.file_url && (
-              <div className="mt-4 flex gap-2">
-                <a
-                  href={`${getBaseUrl().replace(/\/$/, "")}/builds/${build.id}/download`}
-                  className="btn-primary inline-flex"
-                  download
-                >
-                  скачать
-                </a>
-                
-                <button 
-                  className="btn-primary inline-flex"
-                  onClick={() => setShowInstructions(!showInstructions)}
-                >
-                  {showInstructions ? 'понятно' : 'как установить?'}
-                </button>
-              </div>
-            )}
+              )}
 
-            {showInstructions && (
-              <div className="build-instr">
-                <p>1. Скачай файл постройки</p>
-                <p>2. Помести в папку saves (для одиночной игры)</p>
-                <p>3. Или используй WorldEdit / Schematica для загрузки</p>
-                <p>4. Загрузи мир в игре</p>
-              </div>
-            )}
-          </div>
-        )}
+              {build.blocks?.length > 0 && (
+                <div className="build-blocks-section">
+                  <h3 className="mb-2 font-semibold">Необходимые ресурсы</h3>
+                  <div className="build-blocks-grid">
+                    {build.blocks.map((block) => {
+                      const recipeExists = hasRecipe(block.name);
+
+                      return (
+                        <div
+                          key={block.name}
+                          className={`build-block-item ${recipeExists ? 'has-recipe' : ''}`}
+                          onClick={() => recipeExists && openCraft(block.name, block.count)}
+                          style={{ cursor: recipeExists ? 'pointer' : 'default' }}
+                        >
+                          <div className="block-icon">
+                            <span className={`item ${getBlockClass(block.name)}`}></span>
+                          </div>
+                          <div className="block-info">
+                            <span className="build-block-name">{block.name}</span>
+                            <span className="build-block-count">{block.count} шт.</span>
+                          </div>
+                          {recipeExists && (
+                            <span className="build-block-craft">[?]</span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {build.file_url && (
+                <div className="build-actions">
+                  <a
+                    href={`${getBaseUrl().replace(/\/$/, "")}/builds/${build.id}/download`}
+                    className="build-btn-primary"
+                    download
+                  >
+                    скачать
+                  </a>
+
+                  <button
+                    className="build-btn-secondary"
+                    onClick={() => setShowInstructions(!showInstructions)}
+                  >
+                    {showInstructions ? 'понятно' : 'как установить?'}
+                  </button>
+                </div>
+              )}
+
+              {showInstructions && (
+                <div className="build-instr">
+                  <p>1. Скачай файл постройки</p>
+                  <p>2. Помести в папку saves (для одиночной игры)</p>
+                  <p>3. Или используй WorldEdit / Schematica для загрузки</p>
+                  <p>4. Загрузи мир в игре</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </PageSection>
-      
+
       {selectedBlock && (
-        <CraftModal 
+        <CraftModal
           blockName={selectedBlock.name}
           requiredCount={selectedBlock.count}
-          onClose={closeCraft} 
+          onClose={closeCraft}
           recipe={CRAFT_RECIPES[selectedBlock.name.toLowerCase()]}
           getBlockClass={getBlockClass}
         />
