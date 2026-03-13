@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { PageSection } from "../components/PageSection";
-import { buildsApi, type BuildPost, resolveAssetUrl } from "@/lib/api";
+import { buildsApi, type BuildPost, resolveStorageUrl } from "@/lib/api";
 import { BuildsToolbar } from "./BuildsToolbar";
 
 export const metadata = {
@@ -39,7 +39,7 @@ export default async function BuildsPage() {
             {builds.map((build) => {
               const imageSrc =
                 build.image_url ??
-                resolveAssetUrl(build.image) ??
+                resolveStorageUrl(build.image) ??
                 "/placeholder-build.png";
               return (
                 <article key={build.id} className="card">
