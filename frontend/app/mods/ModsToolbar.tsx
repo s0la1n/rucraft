@@ -34,8 +34,6 @@ export function ModsToolbar() {
         setVersions(STATIC_VERSIONS as unknown as string[]);
         setMinecraftVersions(STATIC_MINECRAFT_VERSIONS);
         
-        // TODO: если позже появятся методы в API, можно добавить:
-        // const response = await modsApi.getAll();
         // извлечь уникальные версии из response.data
       } catch (error) {
         console.error("Error loading versions:", error);

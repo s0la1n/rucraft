@@ -17,6 +17,111 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [captchaPassed, setCaptchaPassed] = useState(false);
+  
+  // Состояния для полей с масками
+  const [name, setName] = useState("");
+  const [login, setLogin] = useState("");
+  const [email, setEmail] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [cardCvc, setCardCvc] = useState("");
+
+  // Валидация имени: только русские буквы, пробелы и дефисы
+  const validateName = (value: string) => {
+    const regex = /^[а-яА-ЯёЁ\s-]*$/;
+    return regex.test(value);
+  };
+
+  // Валидация логина: только английские буквы и цифры
+  const validateLogin = (value: string) => {
+    const regex = /^[a-zA-Z0-9]*$/;
+    return regex.test(value);
+  };
+
+  // Валидация email: должен заканчиваться на .ru или .com
+  const validateEmail = (value: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.(ru|com)$/i;
+    return regex.test(value);
+  };
+
+  // Маска для номера карты: XXXX XXXX XXXX XXXX
+  const formatCardNumber = (value: string) => {
+    const numbers = value.replace(/\D/g, "");
+    const groups = numbers.match(/.{1,4}/g) || [];
+    return groups.join(" ").substring(0, 19);
+  };
+
+  // Маска для срока действия: MM/YY
+  const formatExpiry = (value: string) => {
+    const numbers = value.replace(/\D/g, "");
+    if (numbers.length <= 2) return numbers;
+    return `${numbers.substring(0, 2)}/${numbers.substring(2, 4)}`;
+  };
+
+  // Маска для CVC: только цифры, максимум 4
+  const formatCvc = (value: string) => {
+    return value.replace(/\D/g, "").substring(0, 4);
+  };
+
+  // Обработчики изменений
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (validateName(value) || value === "") {
+      setName(value);
+    }
+  };
+
+  const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (validateLogin(value) || value === "") {
+      setLogin(value);
+    }
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
+
+  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCardNumber(e.target.value);
+    setCardNumber(formatted);
+  };
+
+  const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatExpiry(e.target.value);
+    setCardExpiry(formatted);
+  };
+
+  const handleCvcChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCvc(e.target.value);
+    setCardCvc(formatted);
+  };
+
+  // Валидация перед отправкой
+  const validateForm = (): string | null => {
+    if (!name.trim()) {
+      return "Имя обязательно для заполнения";
+    }
+    if (!validateName(name)) {
+      return "Имя может содержать только русские буквы, пробелы и дефисы";
+    }
+
+    if (!login.trim()) {
+      return "Логин обязателен для заполнения";
+    }
+    if (!validateLogin(login)) {
+      return "Логин может содержать только английские буквы и цифры";
+    }
+
+    if (!email.trim()) {
+      return "Email обязателен для заполнения";
+    }
+    if (!validateEmail(email)) {
+      return "Email должен быть в формате user@domain.ru или user@domain.com";
+    }
+
+    return null;
+  };
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -27,17 +132,27 @@ export default function RegisterPage() {
       return;
     }
 
+    // Валидация формы
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
     setLoading(true);
     const form = e.currentTarget;
     const fd = new FormData(form);
-    const name = (fd.get("name") as string)?.trim() ?? "";
-    const login = (fd.get("login") as string)?.trim() ?? "";
-    const email = (fd.get("email") as string)?.trim() ?? "";
     const password = (fd.get("password") as string) ?? "";
     const password_confirmation = (fd.get("password_confirmation") as string) ?? "";
 
     try {
-      await doRegister({ name, login, email, password, password_confirmation });
+      await doRegister({ 
+        name, 
+        login, 
+        email, 
+        password, 
+        password_confirmation 
+      });
       router.replace("/");
       router.refresh();
     } catch (err) {
@@ -62,8 +177,12 @@ export default function RegisterPage() {
               type="text" 
               autoComplete="name" 
               required 
-              placeholder="Как к вам обращаться" 
+              placeholder="Как к вам обращаться"
+              value={name}
+              onChange={handleNameChange}
+              className={styles.formInput}
             />
+            <small className={styles.inputHint}>Только русские буквы, пробелы и дефисы</small>
           </div>
           
           <div className={styles.formGroup}>
@@ -74,8 +193,12 @@ export default function RegisterPage() {
               type="text" 
               autoComplete="username" 
               required 
-              placeholder="Уникальный логин" 
+              placeholder="Уникальный логин"
+              value={login}
+              onChange={handleLoginChange}
+              className={styles.formInput}
             />
+            <small className={styles.inputHint}>Только английские буквы и цифры</small>
           </div>
           
           <div className={styles.formGroup}>
@@ -86,8 +209,12 @@ export default function RegisterPage() {
               type="email" 
               autoComplete="email" 
               required 
-              placeholder="email@example.com" 
+              placeholder="email@example.com"
+              value={email}
+              onChange={handleEmailChange}
+              className={styles.formInput}
             />
+            <small className={styles.inputHint}>Должен заканчиваться на .ru или .com</small>
           </div>
           
           <div className={styles.formGroup}>
@@ -131,10 +258,13 @@ export default function RegisterPage() {
             <label htmlFor="card_number">Номер карты</label>
             <input
               id="card_number"
+              name="card_number"
               type="text"
               inputMode="numeric"
               autoComplete="cc-number"
               placeholder="0000 0000 0000 0000"
+              value={cardNumber}
+              onChange={handleCardNumberChange}
               maxLength={19}
             />
           </div>
@@ -144,10 +274,13 @@ export default function RegisterPage() {
               <label htmlFor="card_expiry">Срок действия</label>
               <input
                 id="card_expiry"
+                name="card_expiry"
                 type="text"
                 inputMode="numeric"
                 autoComplete="cc-exp"
                 placeholder="MM/YY"
+                value={cardExpiry}
+                onChange={handleExpiryChange}
                 maxLength={5}
               />
             </div>
@@ -155,10 +288,13 @@ export default function RegisterPage() {
               <label htmlFor="card_cvc">CVC</label>
               <input
                 id="card_cvc"
+                name="card_cvc"
                 type="password"
                 inputMode="numeric"
                 autoComplete="cc-csc"
                 placeholder="123"
+                value={cardCvc}
+                onChange={handleCvcChange}
                 maxLength={4}
               />
             </div>

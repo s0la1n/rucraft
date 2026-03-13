@@ -46,7 +46,6 @@ export default async function BuildsPage() {
                 return (
                   <article key={build.id} className="build-card">
                     <div className="build-card-image">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={imageSrc} alt={build.title} />
                     </div>
                     <div className="build-card-body">

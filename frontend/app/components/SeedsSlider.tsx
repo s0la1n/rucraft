@@ -55,7 +55,6 @@ export function SeedsSlider({ seeds }: SeedsSliderProps) {
               href={`/seeds/${currentSeed.id}`}
               className="builds-img-placeholder seeds-slide-bg"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={imageSrc} alt={currentSeed.title} />
             </Link>
             <div className="seeds-slide-info">
@@ -70,7 +69,6 @@ export function SeedsSlider({ seeds }: SeedsSliderProps) {
           </div>
         </div>
 
-        {/* Стрелки с иконками из /developers/strelka.png */}
         {visibleSeeds.length > 1 && (
           <>
             <button
@@ -79,8 +77,6 @@ export function SeedsSlider({ seeds }: SeedsSliderProps) {
               aria-label="Предыдущий сид"
               onClick={handlePrev}
             >
-              {/* Левая стрелка — зеркально отражённая через CSS-класс */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img 
                 src="/developers/strelka.svg" 
                 alt="Предыдущий сид"
@@ -94,8 +90,6 @@ export function SeedsSlider({ seeds }: SeedsSliderProps) {
               aria-label="Следующий сид"
               onClick={handleNext}
             >
-              {/* Правая стрелка — обычная */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img 
                 src="/developers/strelka.svg" 
                 alt="Следующий сид"
