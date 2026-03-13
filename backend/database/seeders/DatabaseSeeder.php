@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             SeedSeeder::class,
             BuildSeeder::class,
             SkinSeeder::class,
+            QuizSeeder::class,
         ]);
     }
 }
