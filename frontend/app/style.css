@@ -1711,6 +1711,307 @@
   }
 }
 
+/* Craft Modal styles */
+.craft-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.craft-modal-content {
+  background: #8b8b8b;
+  border: 6px solid #c6c6c6;
+  max-width: 600px;
+  width: 90%;
+  padding: 20px;
+  position: relative;
+}
+
+.craft-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #c6c6c6;
+}
+
+.craft-modal-header h3 {
+  margin: 0;
+  color: white;
+  font-size: 1.5rem;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.craft-modal-close {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: white;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #c6c6c6;
+  border: 3px solid #555;
+  border-radius: 0;
+}
+
+.craft-modal-close:hover {
+  background: #ff69b4;
+}
+
+.crafting-table {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.crafting-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 80px);
+  grid-template-rows: repeat(3, 80px);
+  gap: 5px;
+  background: #a0a0a0;
+  padding: 10px;
+  border: 4px solid #555;
+}
+
+.crafting-slot {
+  background: #c6c6c6;
+  border: 3px solid #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.crafting-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.crafting-item .item {
+  width: 32px;
+  height: 32px;
+}
+
+.crafting-item-name {
+  font-size: 0.7rem;
+  text-align: center;
+  position: absolute;
+  bottom: -20px;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 2px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+  display: none;
+}
+
+.crafting-slot:hover .crafting-item-name {
+  display: block;
+}
+
+.crafting-item-count {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.crafting-arrow {
+  font-size: 3rem;
+  color: white;
+  text-shadow: 3px 3px 0 #000;
+}
+
+.crafting-result {
+  background: #a0a0a0;
+  padding: 10px;
+  border: 4px solid #555;
+}
+
+.result-slot {
+  width: 100px;
+  height: 100px;
+}
+
+.craft-no-recipe {
+  color: white;
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 30px;
+}
+
+.crafting-info {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f0f0f0;
+  border: 3px solid #333;
+}
+
+.crafting-need {
+  font-weight: bold;
+  color: #ff69b4;
+  margin: 0 0 10px 0;
+  font-size: 1.1rem;
+}
+
+.crafting-need-title {
+  font-weight: 600;
+  margin: 0 0 10px 0;
+}
+
+.crafting-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  background: white;
+  border: 2px solid #333;
+}
+
+.summary-item .item {
+  width: 32px;
+  height: 32px;
+}
+
+.summary-item-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.summary-item-count {
+  font-weight: 700;
+  color: #ff69b4;
+}
+
+/* Build blocks section */
+.build-blocks-section {
+  margin: 30px 0;
+}
+
+.build-blocks-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.build-block-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f5f5f5;
+  border: 3px solid #333;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.build-block-item.has-recipe {
+  border-color: #ff69b4;
+}
+
+.build-block-item:hover {
+  background: #e0e0e0;
+  border-color: #ff69b4;
+  transform: scale(1.02);
+}
+
+.block-icon {
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 2px solid #333;
+}
+
+.block-info {
+  flex: 1;
+}
+
+.build-block-name {
+  font-weight: 600;
+  font-size: 1rem;
+  display: block;
+}
+
+.build-block-count {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.build-block-craft svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Build instructions */
+.build-instr {
+  margin-top: 20px;
+  padding: 20px;
+  background: #f0f0f0;
+  border: 3px solid black;
+}
+
+.build-instr p {
+  margin: 10px 0;
+  font-size: 1.1rem;
+  padding-left: 20px;
+  position: relative;
+  color: black !important;
+}
+
+.build-instr p::before {
+  content: "•";
+  color: #ff69b4;
+  font-weight: bold;
+  position: absolute;
+  left: 5px;
+}
+
+@media (min-width: 768px) {
+  .build-blocks-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .build-blocks-grid {
+    grid-template-columns: 1fr;
+  }
+}
 /* ========== СТРАНИЦА ВЫБОРА ТЕСТОВ ========== */
 .quizzes-grid {
   display: grid;
