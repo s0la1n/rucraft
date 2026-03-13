@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { PageSection } from "../components/PageSection";
-import { modsApi, type ModPost, type ModsIndexResponse, resolveAssetUrl } from "@/lib/api";
+import { modsApi, type ModPost, type ModsIndexResponse, resolveStorageUrl } from "@/lib/api";
 import { ModsToolbar } from "./ModsToolbar";
 
 export const metadata = {
@@ -123,7 +123,7 @@ export default async function ModsPage(props: { searchParams?: SearchParams }) {
                 {mods.map((mod) => {
                   const imageSrc =
                     mod.image_url ??
-                    resolveAssetUrl(mod.image) ??
+                    resolveStorageUrl(mod.image) ??
                     "/placeholder-mod.png";
                   return (
                     <article key={mod.id} className="card">
