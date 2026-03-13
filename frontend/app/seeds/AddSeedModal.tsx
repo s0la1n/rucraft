@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { seedsApi } from "@/lib/api";
+import styles from './add-seed-modal.module.css';
 
 const VERSIONS = ["java", "bedrock", "java_bedrock"] as const;
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/jpg"];
@@ -129,18 +130,18 @@ export function AddSeedModal({ open, onClose, onSuccess }: Props) {
   if (!open) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="add-seed-title">
-      <div className="modal-content add-seed-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
+    <div className={styles.modalOverlay} onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="add-seed-title">
+      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.modalHeader}>
           <h2 id="add-seed-title">Добавить сид</h2>
-          <button type="button" className="modal-close" onClick={onClose} aria-label="Закрыть">
+          <button type="button" className={styles.modalClose} onClick={onClose} aria-label="Закрыть">
             ×
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="modal-body">
-          {error && <p className="form-error">{error}</p>}
+        <form onSubmit={handleSubmit} className={styles.modalBody}>
+          {error && <p className={styles.formError}>{error}</p>}
           
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label htmlFor="seed-title">Название *</label>
             <input
               id="seed-title"
@@ -153,7 +154,7 @@ export function AddSeedModal({ open, onClose, onSuccess }: Props) {
             />
           </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label htmlFor="seed-number">Номер сида *</label>
             <input
               id="seed-number"
@@ -166,7 +167,7 @@ export function AddSeedModal({ open, onClose, onSuccess }: Props) {
             />
           </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label htmlFor="seed-version">Версия *</label>
             <select id="seed-version" value={version} onChange={(e) => setVersion(e.target.value)} required>
               {VERSIONS.map((v) => (
@@ -177,7 +178,7 @@ export function AddSeedModal({ open, onClose, onSuccess }: Props) {
             </select>
           </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label htmlFor="seed-minecraft-release">Релиз Minecraft (необязательно)</label>
             <input
               id="seed-minecraft-release"
@@ -189,7 +190,7 @@ export function AddSeedModal({ open, onClose, onSuccess }: Props) {
             />
           </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label htmlFor="seed-description">Описание (необязательно)</label>
             <textarea
               id="seed-description"
@@ -201,10 +202,10 @@ export function AddSeedModal({ open, onClose, onSuccess }: Props) {
             />
           </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label>Координаты *</label>
-            <div className="coordinates-row">
-              <div className="coordinate-input">
+            <div className={styles.coordinatesRow}>
+              <div className={styles.coordinateInput}>
                 <label htmlFor="seed-x">X</label>
                 <input
                   id="seed-x"
@@ -215,7 +216,7 @@ export function AddSeedModal({ open, onClose, onSuccess }: Props) {
                   required
                 />
               </div>
-              <div className="coordinate-input">
+              <div className={styles.coordinateInput}>
                 <label htmlFor="seed-y">Y</label>
                 <input
                   id="seed-y"
@@ -226,7 +227,7 @@ export function AddSeedModal({ open, onClose, onSuccess }: Props) {
                   required
                 />
               </div>
-              <div className="coordinate-input">
+              <div className={styles.coordinateInput}>
                 <label htmlFor="seed-z">Z</label>
                 <input
                   id="seed-z"
@@ -240,7 +241,7 @@ export function AddSeedModal({ open, onClose, onSuccess }: Props) {
             </div>
           </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label htmlFor="seed-image-file">Изображение (PNG/JPG) *</label>
             <input
               ref={imageInputRef}
@@ -250,14 +251,14 @@ export function AddSeedModal({ open, onClose, onSuccess }: Props) {
               onChange={handleImageFileChange}
               required={!imageFile}
             />
-            {imageFile && <p className="form-hint">Выбран: {imageFile.name}</p>}
+            {imageFile && <p className={styles.formHint}>Выбран: {imageFile.name}</p>}
           </div>
 
-          <div className="modal-footer">
-            <button type="button" className="btn-secondary" onClick={onClose}>
+          <div className={styles.modalFooter}>
+            <button type="button" className={styles.btnSecondary} onClick={onClose}>
               Отмена
             </button>
-            <button type="submit" className="btn-submit" disabled={submitting}>
+            <button type="submit" className={styles.btnSubmit} disabled={submitting}>
               {submitting ? "Отправка…" : "Добавить"}
             </button>
           </div>
