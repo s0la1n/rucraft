@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { PageSection } from "../../components/PageSection";
 import { seedsApi, type SeedPost, resolveStorageUrl } from "@/lib/api";
+import styles from "./seed.module.css";
 
 type Coordinates = {
   name: string;
@@ -62,51 +63,53 @@ export default function SeedShowPage() {
   }, [id]);
 
   return (
-    <div className="page-content">
+    <div className={styles.pageContent}>
       <PageSection title={seed ? seed.title : "Сид"}>
-        {loading && <p>Загрузка…</p>}
-        {error && <p className="form-error">{error}</p>}
+        {loading && <p className={styles.loading}>Загрузка…</p>}
+        {error && <p className={styles.formError}>{error}</p>}
         {!loading && !error && seed && (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <p>
+          <div className={styles.spaceY4}>
+            <div className={styles.spaceY2}>
+              <p className={styles.infoText}>
                 Автор: <strong>{seed.author.name}</strong>
               </p>
-              <p>
+              <p className={styles.infoText}>
                 Номер сида: <code>{seed.seed}</code>
               </p>
-              <p>
+              <p className={styles.infoText}>
                 Версия: <strong>{seed.version}</strong>, релиз: <strong>{seed.release}</strong>
               </p>
               
               {/* Отображаем все координаты */}
               {coordinates.length > 0 ? (
-                <div>
-                  <h3 className="text-lg font-semibold mt-4 mb-2">Интересные места:</h3>
-                  <ul className="list-disc pl-5 space-y-2">
+                <div className={styles.coordinatesSection}>
+                  <h3 className={styles.coordinatesTitle}>Интересные места:</h3>
+                  <ul className={styles.coordinatesList}>
                     {coordinates.map((coord, index) => (
-                      <li key={index} className="text-sm">
-                        <span className="font-medium">{coord.name}:</span>{" "}
-                        x = {coord.x}, y = {coord.y}, z = {coord.z}
+                      <li key={index} className={styles.coordinatesItem}>
+                        <span className={styles.coordinatesName}>{coord.name}:</span>{" "}
+                        <span className={styles.coordinatesValues}>
+                          x = {coord.x}, y = {coord.y}, z = {coord.z}
+                        </span>
                       </li>
                     ))}
                   </ul>
                 </div>
               ) : (
-                <p>
+                <p className={styles.infoText}>
                   Координаты: x = {seed.x || 0}, y = {seed.y || 0}, z = {seed.z || 0}
                 </p>
               )}
             </div>
 
             {seed.images && seed.images.length > 0 && (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-6">
+              <div className={styles.grid}>
                 {seed.images.map((src) => {
                   const resolved = resolveStorageUrl(src) ?? src;
                   return (
-                    <div key={src} className="overflow-hidden rounded-xl bg-zinc-200 dark:bg-zinc-700">
+                    <div key={src} className={styles.imageContainer}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={resolved} alt={seed.title} className="h-full w-full object-cover" />
+                      <img src={resolved} alt={seed.title} className={styles.image} />
                     </div>
                   );
                 })}
