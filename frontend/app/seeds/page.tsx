@@ -4,6 +4,7 @@ import { PageSection } from "../components/PageSection";
 import { seedsApi, type SeedPost, resolveAssetUrl, resolveStorageUrl } from "@/lib/api";
 import { SeedsToolbar } from "./SeedsToolbar";
 import MinecraftSeedGenerator from "../components/MinecraftSeedGenerator";
+import styles from './seeds.module.css';
 
 export const metadata = {
   title: "Сиды — RuCraft",
@@ -11,7 +12,7 @@ export const metadata = {
 };
 
 const apiErrorMessage = (
-  <p className="form-error">
+  <p className={styles.formError}>
     Не удалось загрузить данные. Убедитесь, что бэкенд запущен (<code>php artisan serve</code>) и в <code>.env.local</code> указан <code>NEXT_PUBLIC_API_URL</code> (например, http://localhost:8000/api).
   </p>
 );
@@ -26,31 +27,47 @@ async function getSeeds(): Promise<{ data: SeedPost[]; error?: boolean }> {
   }
 }
 
-export default async function SeedsPage() {
+export default async function SeedsPage({
+  searchParams,
+}: {
+  searchParams: { page?: string };
+}) {
   const { data: seeds, error: fetchFailed } = await getSeeds();
+  
+  // Пагинация
+  const currentPage = Number(searchParams.page) || 1;
+  const itemsPerPage = 6;
+  const totalPages = Math.ceil(seeds.length / itemsPerPage);
+  const start = (currentPage - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const currentSeeds = seeds.slice(start, end);
 
   return (
-    <div className="page-content">
+    <div className={styles.pageContent}>
       <PageSection title="Сиды">
         <Suspense fallback={null}>
           <SeedsToolbar />
         </Suspense>
-        <div className="mb-6">
-          <Link href="/seeds/map" className="btn-link inline-flex">
+        
+        <div className={styles.mb6}>
+          <Link href="/seeds/map" className={styles.btnLinkLarge}>
             Открыть карту сидов
           </Link>
         </div>
+
         {fetchFailed ? (
           apiErrorMessage
         ) : seeds.length === 0 ? (
           <p>Сидов пока нет.</p>
         ) : (
           <>
-            <div className="mb-8">
+            <div className={styles.mb8}>
               <MinecraftSeedGenerator />
             </div>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-              {seeds.map((seed) => {
+
+            {/* Сетка с текущей страницей */}
+            <div className={styles.grid}>
+              {currentSeeds.map((seed) => {
                 const imageSrc = 
                   seed.image_url ?? 
                   resolveStorageUrl(seed.image) ?? 
@@ -58,23 +75,22 @@ export default async function SeedsPage() {
                   "/placeholder-seed.png";
                   
                 return (
-                  <article key={seed.id} className="card">
-                    <div className="card-image">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <article key={seed.id} className={styles.card}>
+                    <div className={styles.cardImage}>
                       <img src={imageSrc} alt={seed.title} />
                     </div>
-                    <div className="card-body">
-                      <h3 className="card-title">{seed.title}</h3>
-                      <p className="card-meta">
+                    <div className={styles.cardBody}>
+                      <h3 className={styles.cardTitle}>{seed.title}</h3>
+                      <p className={styles.cardMeta}>
                         Автор: <strong>{seed.author.name}</strong>
                       </p>
-                      <p className="card-text">
+                      <p className={styles.cardText}>
                         Сид: <code>{seed.seed}</code>
                       </p>
-                      <p className="card-text">
+                      <p className={styles.cardText}>
                         Версия: {seed.version}, релиз: {seed.release}
                       </p>
-                      <Link href={`/seeds/${seed.id}`} className="btn-link mt-3 inline-flex">
+                      <Link href={`/seeds/${seed.id}`} className={`${styles.btnLink} ${styles.mt3}`}>
                         Подробнее
                       </Link>
                     </div>
@@ -82,6 +98,39 @@ export default async function SeedsPage() {
                 );
               })}
             </div>
+
+            {/* Пагинация */}
+            {totalPages > 1 && (
+              <div className={styles.paginationContainer}>
+                {currentPage > 1 && (
+                  <Link 
+                    href={`/seeds?page=${currentPage - 1}`} 
+                    className={styles.paginationBtn}
+                  >
+                    ← Назад
+                  </Link>
+                )}
+                
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <Link
+                    key={page}
+                    href={`/seeds?page=${page}`}
+                    className={`${styles.paginationBtn} ${page === currentPage ? styles.activePage : ''}`}
+                  >
+                    {page}
+                  </Link>
+                ))}
+
+                {currentPage < totalPages && (
+                  <Link 
+                    href={`/seeds?page=${currentPage + 1}`} 
+                    className={styles.paginationBtn}
+                  >
+                    Вперед →
+                  </Link>
+                )}
+              </div>
+            )}
           </>
         )}
       </PageSection>

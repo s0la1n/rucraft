@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import styles from './seeds.module.css';
 
 type SeedType = 'random' | 'text' | 'date' | 'coordinates' | 'biome';
 
@@ -147,336 +148,290 @@ const MinecraftSeedGenerator: React.FC = () => {
   return (
     <div className="minecraft-seed-generator">
       <style>{`
-        .container {
+        .generator-container {
           max-width: 650px;
-          margin: 7% auto;
+          margin: 0 auto 40px;
           padding: 30px;
-          background: linear-gradient(145deg, #fff9e6, #c3f186);
-          border-radius: 50px 50px 30px 30px;
-          box-shadow: 0 20px 0 #1d4fb9, 0 25px 30px rgba(0,0,0,0.2);
-          border: 5px solid #ff8b8b;
-          font-family: 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
+          background-color: #fff700;
+          border: 2px solid #ffcc00;
+          font-family: Arial, sans-serif;
         }
         
-        .title {
+        .generator-title {
           text-align: center;
-          color: #ff3399;
-          font-size: 20pt;
+          color: #222;
+          font-size: 24px;
           margin: 0 0 25px 0;
-          text-shadow: 3px 3px 0 #ffcc00, 5px 5px 0 #66ccff;
-          transform: rotate(-1deg);
           font-weight: bold;
-          letter-spacing: 2px;
+          text-transform: uppercase;
+          border-bottom: 2px solid #333;
+          padding-bottom: 10px;
         }
         
-        .type-selector {
+        .generator-type-selector {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-          gap: 12px;
+          gap: 10px;
           margin-bottom: 25px;
         }
         
-        .type-btn {
-          padding: 15px 8px;
-          background: #ffde59;
-          border: 4px solid #ff914d;
-          border-radius: 40px 40px 20px 20px;
+        .generator-type-btn {
+          padding: 12px 8px;
+          background-color: #eaeaea;
+          border: 2px solid #333;
           color: #333;
-          font-size: 8pt;
+          font-size: 12px;
           font-weight: bold;
-          font-family: 'Comic Sans MS', cursive;
           cursor: pointer;
           transition: all 0.2s;
-          box-shadow: 0 8px 0 #b45f06;
           text-transform: uppercase;
         }
         
-        .type-btn:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 13px 0 #b45f06;
-          background: #ffeb7a;
+        .generator-type-btn:hover {
+          background-color: #d0d0d0;
+          border-color: #000;
         }
         
-        .type-btn:active {
-          transform: translateY(5px);
-          box-shadow: 0 3px 0 #b45f06;
-        }
-        
-        .type-btn.active {
-          background: #ffb347;
-          border-color: #ff3399;
-          box-shadow: 0 8px 0 #cc3366;
+        .generator-type-btn.active {
+          background-color: #0066cc;
+          border-color: #004080;
           color: white;
         }
         
-        .input-group {
-          background: #ccf5ff;
+        .generator-input-group {
+          background-color: #fff;
           padding: 20px;
-          border-radius: 30px;
-          border: 4px dashed #66ccff;
+          border: 2px solid #333;
           margin-bottom: 25px;
         }
         
-        .input-group label {
+        .generator-input-group label {
           display: block;
-          margin-bottom: 12px;
-          color: #0066cc;
-          font-size: 12pt;
+          margin-bottom: 10px;
+          color: #222;
+          font-size: 14px;
           font-weight: bold;
-          text-shadow: 2px 2px 0 #ffcc00;
+          text-transform: uppercase;
         }
         
-        .input-group input {
+        .generator-input-group input {
           width: 100%;
-          padding: 18px 20px;
+          padding: 12px;
           background: white;
-          border: 5px solid #66ccff;
-          border-radius: 60px;
+          border: 2px solid #333;
           color: #333;
-          font-size: 12pt;
-          font-family: 'Comic Sans MS', cursive;
+          font-size: 14px;
           transition: all 0.2s;
-          box-shadow: inset 0 4px 8px rgba(0,0,0,0.1);
         }
         
-        .input-group input:focus {
+        .generator-input-group input:focus {
           outline: none;
-          border-color: #ff99cc;
-          background: #fff0f5;
-          transform: scale(1.02);
+          border-color: #0066cc;
+          background: #f0f8ff;
         }
         
-        .input-group input::placeholder {
-          color: #99ccff;
+        .generator-input-group input::placeholder {
+          color: #999;
         }
         
-        .generate-btn {
+        .generator-generate-btn {
           width: 100%;
-          padding: 20px;
-          background: linear-gradient(145deg, #00ff99, #33ccff);
-          border: none;
-          border-radius: 60px;
+          padding: 15px;
+          background-color: #0066cc;
+          border: 2px solid #004080;
           color: white;
-          font-size: 18pt;
+          font-size: 18px;
           font-weight: bold;
-          font-family: 'Comic Sans MS', cursive;
           cursor: pointer;
           transition: all 0.2s;
           margin-bottom: 30px;
-          text-shadow: 3px 3px 0 #009966;
-          box-shadow: 0 15px 0 #0099cc, 0 10px 20px rgba(0,0,0,0.2);
-          text-transform: uppercase;
-          letter-spacing: 3px;
-        }
-        
-        .generate-btn:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 20px 0 #0099cc, 0 15px 25px rgba(0,0,0,0.2);
-        }
-        
-        .generate-btn:active {
-          transform: translateY(10px);
-          box-shadow: 0 5px 0 #0099cc, 0 10px 20px rgba(0,0,0,0.2);
-        }
-        
-        .seed-result {
-          background: linear-gradient(45deg, #ffff99, #ffccff);
-          padding: 25px;
-          border-radius: 40px;
-          text-align: center;
-          border: 8px solid #ff66b2;
-          margin-bottom: 30px;
-          box-shadow: 0 10px 0 #cc3399;
-        }
-        
-        .seed-label {
-          color: #663399;
-          margin-bottom: 15px;
-          font-size: 20px;
-          font-weight: bold;
           text-transform: uppercase;
           letter-spacing: 2px;
         }
         
-        .seed-value {
-          font-size: 36px;
-          color: #ff3399;
+        .generator-generate-btn:hover {
+          background-color: #004080;
+        }
+        
+        .generator-seed-result {
+          background-color: #fff;
+          padding: 25px;
+          border: 2px solid #333;
+          text-align: center;
+          margin-bottom: 30px;
+        }
+        
+        .generator-seed-label {
+          color: #222;
+          margin-bottom: 15px;
+          font-size: 16px;
+          font-weight: bold;
+          text-transform: uppercase;
+        }
+        
+        .generator-seed-value {
+          font-size: 32px;
+          color: #0066cc;
           word-break: break-all;
           font-family: 'Courier New', monospace;
           margin-bottom: 20px;
-          background: white;
-          padding: 20px;
-          border-radius: 30px;
-          border: 5px solid #66ccff;
-          box-shadow: inset 0 0 20px #ffcc00;
+          background: #f5f5f5;
+          padding: 15px;
+          border: 2px solid #333;
         }
         
-        .copy-btn {
-          padding: 15px 40px;
-          background: #66ff66;
-          border: 6px solid #ffcc00;
-          border-radius: 60px;
+        .generator-copy-btn {
+          padding: 12px 30px;
+          background-color: #eaeaea;
+          border: 2px solid #333;
           color: #333;
-          font-size: 24px;
+          font-size: 16px;
           font-weight: bold;
-          font-family: 'Comic Sans MS', cursive;
           cursor: pointer;
           transition: all 0.2s;
-          box-shadow: 0 10px 0 #339933;
+          text-transform: uppercase;
         }
         
-        .copy-btn:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 13px 0 #339933;
-          background: #7aff7a;
+        .generator-copy-btn:hover {
+          background-color: #d0d0d0;
+          border-color: #000;
         }
         
-        .copy-btn:active {
-          transform: translateY(7px);
-          box-shadow: 0 3px 0 #339933;
-        }
-        
-        .error {
-          color: #ff3333;
+        .generator-error {
+          color: #c62828;
           padding: 15px;
-          background: #ffeeaa;
-          border: 5px solid #ff6666;
-          border-radius: 40px;
+          background: #ffebee;
+          border: 2px solid #c62828;
           margin-bottom: 20px;
           text-align: center;
-          font-size: 20px;
+          font-size: 16px;
           font-weight: bold;
         }
         
-        .history {
+        .generator-history {
           margin-top: 30px;
-          background: #e6ccff;
-          padding: 25px;
-          border-radius: 40px;
-          border: 6px dotted #aa80ff;
+          background-color: #fff;
+          padding: 20px;
+          border: 2px solid #333;
         }
         
-        .history h3 {
-          color: #663366;
+        .generator-history h3 {
+          color: #222;
           margin: 0 0 15px 0;
-          font-size: 28px;
+          font-size: 18px;
           text-align: center;
-          text-shadow: 2px 2px 0 #ff99cc;
+          text-transform: uppercase;
+          font-weight: bold;
         }
         
-        .history-list {
-          background: #ffd9b3;
-          border-radius: 30px;
-          border: 5px solid #ff9933;
+        .generator-history-list {
+          background-color: #f5f5f5;
+          border: 2px solid #333;
           overflow: hidden;
         }
         
-        .history-item {
+        .generator-history-item {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 15px 20px;
-          border-bottom: 3px dashed #ff9933;
+          padding: 12px 15px;
+          border-bottom: 1px solid #333;
           cursor: pointer;
           transition: all 0.2s;
-          background: #fff0d4;
+          background-color: #fff;
         }
         
-        .history-item:hover {
-          background: #ffe6b3;
-          transform: scale(1.02);
-          padding-left: 30px;
+        .generator-history-item:hover {
+          background-color: #eaeaea;
         }
         
-        .history-item:last-child {
+        .generator-history-item:last-child {
           border-bottom: none;
         }
         
-        .history-seed {
+        .generator-history-seed {
           font-family: 'Courier New', monospace;
-          color: #cc3300;
-          font-size: 18px;
+          color: #0066cc;
+          font-size: 14px;
           font-weight: bold;
         }
         
-        .history-info {
-          font-size: 16px;
-          color: #ff6600;
+        .generator-history-info {
+          font-size: 12px;
+          color: #666;
         }
         
-        .stats {
+        .generator-stats {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: 15px;
           margin-top: 30px;
-          padding: 20px;
-          background: #b3e6ff;
-          border-radius: 50px;
-          border: 5px solid #0099ff;
+          padding: 15px;
+          background-color: #fff;
+          border: 2px solid #333;
         }
         
-        .stat-item {
+        .generator-stat-item {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 8px;
+          gap: 5px;
           text-align: center;
-          background: white;
-          padding: 12px;
-          border-radius: 25px;
-          box-shadow: 0 5px 0 #0099cc;
+          padding: 10px;
+          background-color: #f5f5f5;
+          border: 2px solid #333;
         }
         
-        .stat-label {
-          font-size: 14px;
-          color: #333;
+        .generator-stat-label {
+          font-size: 12px;
+          color: #666;
           font-weight: bold;
           text-transform: uppercase;
         }
         
-        .stat-value {
-          color: #ff3399;
+        .generator-stat-value {
+          color: #222;
           font-weight: bold;
-          font-size: 18px;
+          font-size: 16px;
         }
 
-        .disabled-input {
-          background: #fff0f0;
+        .generator-disabled-input {
+          background-color: #f0f0f0;
           opacity: 0.8;
           cursor: not-allowed;
         }
       `}</style>
 
-      <div className="container">
-        <h1 className="title">Генератор сидиков Minecraft</h1>
+      <div className="generator-container">
+        <h1 className="generator-title">Генератор сидов Minecraft</h1>
         
-        <div className="type-selector">
+        <div className="generator-type-selector">
           <button 
-            className={`type-btn ${seedType === 'random' ? 'active' : ''}`}
+            className={`generator-type-btn ${seedType === 'random' ? 'active' : ''}`}
             onClick={() => setSeedType('random')}
           >
             Случайный
           </button>
           <button 
-            className={`type-btn ${seedType === 'text' ? 'active' : ''}`}
+            className={`generator-type-btn ${seedType === 'text' ? 'active' : ''}`}
             onClick={() => setSeedType('text')}
           >
             Из текста
           </button>
           <button 
-            className={`type-btn ${seedType === 'date' ? 'active' : ''}`}
+            className={`generator-type-btn ${seedType === 'date' ? 'active' : ''}`}
             onClick={() => setSeedType('date')}
           >
             Из даты
           </button>
           <button 
-            className={`type-btn ${seedType === 'coordinates' ? 'active' : ''}`}
+            className={`generator-type-btn ${seedType === 'coordinates' ? 'active' : ''}`}
             onClick={() => setSeedType('coordinates')}
           >
             Координаты
           </button>
           <button 
-            className={`type-btn ${seedType === 'biome' ? 'active' : ''}`}
+            className={`generator-type-btn ${seedType === 'biome' ? 'active' : ''}`}
             onClick={() => setSeedType('biome')}
           >
             Для биома
@@ -484,76 +439,76 @@ const MinecraftSeedGenerator: React.FC = () => {
         </div>
 
         {seedType === 'text' && (
-          <div className="input-group">
-            <label>Напиши что-нибудь волшебное:</label>
+          <div className="generator-input-group">
+            <label>Введите текст:</label>
             <input
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="Например: мой классный мир"
+              placeholder="Например: my cool world"
               onKeyPress={handleKeyPress}
             />
           </div>
         )}
 
         {seedType === 'biome' && (
-          <div className="input-group">
-            <label>Волшебные биомы:</label>
+          <div className="generator-input-group">
+            <label>Доступные биомы:</label>
             <input
               type="text"
-              value="равнины, пустыня, джунгли, тайга, снега, океан"
+              value="plains, desert, jungle, taiga, snowy, ocean"
               disabled
-              className="disabled-input"
+              className="generator-disabled-input"
             />
           </div>
         )}
 
-        {error && <div className="error"> {error}</div>}
+        {error && <div className="generator-error">{error}</div>}
 
-        <button className="generate-btn" onClick={generateSeed}>
-           Создать сидик 
+        <button className="generator-generate-btn" onClick={generateSeed}>
+          Сгенерировать сид
         </button>
 
         {seed && (
-          <div className="seed-result">
-            <div className="seed-label">Твой волшебный сид:</div>
-            <div className="seed-value">{seed}</div>
-            <button className="copy-btn" onClick={copyToClipboard}>
-              Скопировать
+          <div className="generator-seed-result">
+            <div className="generator-seed-label">Ваш сид</div>
+            <div className="generator-seed-value">{seed}</div>
+            <button className="generator-copy-btn" onClick={copyToClipboard}>
+              Копировать
             </button>
           </div>
         )}
 
         {history.length > 0 && (
-          <div className="history">
-            <h3>История твоих сидиков</h3>
-            <div className="history-list">
+          <div className="generator-history">
+            <h3>История</h3>
+            <div className="generator-history-list">
               {history.map((item, index) => (
                 <div 
                   key={index} 
-                  className="history-item"
+                  className="generator-history-item"
                   onClick={() => setSeed(item.seed)}
                 >
-                  <span className="history-seed">{item.seed.substring(0, 12)}...</span>
-                  <span className="history-info">{item.type} • {item.date}</span>
+                  <span className="generator-history-seed">{item.seed.substring(0, 12)}...</span>
+                  <span className="generator-history-info">{item.type} • {item.date}</span>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        <div className="stats">
-          <div className="stat-item">
-            <span className="stat-label">Диапазон</span>
-            <span className="stat-value">±9.2кв</span>
+        <div className="generator-stats">
+          <div className="generator-stat-item">
+            <span className="generator-stat-label">Диапазон</span>
+            <span className="generator-stat-value">±9.2кв</span>
           </div>
-          <div className="stat-item">
-            <span className="stat-label">Битов</span>
-            <span className="stat-value">64</span>
+          <div className="generator-stat-item">
+            <span className="generator-stat-label">Битов</span>
+            <span className="generator-stat-value">64</span>
           </div>
-          <div className="stat-item">
-            <span className="stat-label">Версии</span>
-            <span className="stat-value">Java/Bedrock</span>
+          <div className="generator-stat-item">
+            <span className="generator-stat-label">Версии</span>
+            <span className="generator-stat-value">Java/Bedrock</span>
           </div>
         </div>
       </div>

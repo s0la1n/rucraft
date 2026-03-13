@@ -1,0 +1,164 @@
+/* seeds.module.css */
+
+.pageContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Горизонтальные карточки */
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.card {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  background-color: #bfff00;
+  border: 2px solid #333;
+  overflow: hidden;
+}
+
+.cardImage {
+  width: 200px;
+  height: 200px;
+  flex-shrink: 0;
+  border-right: 2px solid #333;
+  background-color: #ddd;
+}
+
+.cardImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cardBody {
+  flex: 1;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cardTitle {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0 0 10px 0;
+  color: #222;
+}
+
+.cardMeta {
+  font-size: 14px;
+  color: #555;
+  margin: 0;
+}
+
+.cardMeta strong {
+  color: #000;
+  font-weight: 600;
+}
+
+.cardText {
+  font-size: 14px;
+  color: #444;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.cardText code {
+  background: #787d98;
+  padding: 2px 6px;
+  border: 1px solid #999;
+  font-family: monospace;
+  font-size: 13px;
+}
+
+/* Кнопки */
+.btnLink {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #0066cc;
+  color: white;
+  text-decoration: none;
+  border: 2px solid #004080;
+  font-weight: 500;
+  text-align: center;
+  transition: background-color 0.2s;
+  margin-top: 10px;
+  align-self: flex-start;
+}
+
+.btnLink:hover {
+  background-color: #004080;
+}
+
+.btnLinkLarge {
+  composes: btnLink;
+  padding: 12px 24px;
+  font-size: 16px;
+}
+
+/* Отступы */
+.mb6 {
+  margin-bottom: 30px;
+}
+
+.mb8 {
+  margin-bottom: 40px;
+}
+
+.mt3 {
+  margin-top: 15px;
+}
+
+/* Пагинация */
+.paginationContainer {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+.paginationBtn {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #eaeaea;
+  border: 2px solid #333;
+  color: #333;
+  text-decoration: none;
+  font-weight: normal;
+  transition: all 0.2s;
+}
+
+.paginationBtn:hover {
+  background-color: #d0d0d0;
+  border-color: #000;
+}
+
+.activePage {
+  background-color: #0066cc !important;
+  border-color: #004080 !important;
+  color: white !important;
+  font-weight: bold !important;
+}
+
+/* Сообщение об ошибке */
+.formError {
+  background-color: #ffebee;
+  border: 2px solid #c62828;
+  padding: 15px;
+  color: #c62828;
+  margin: 20px 0;
+}
+
+.formError code {
+  background: #ffcdd2;
+  padding: 2px 4px;
+}
