@@ -145,7 +145,7 @@ export default async function ModsPage(props: { searchParams?: SearchParams }) {
                           )}
                         </div>
                         {mod.description && <p className="card-text line-clamp-3">{mod.description}</p>}
-                        <Link href={`/mods/${mod.id}`} className="btn-link mt-3 inline-flex">
+                        <Link href={`/mods/${mod.id}`} className="btn-download">
                           Подробнее
                         </Link>
                       </div>
