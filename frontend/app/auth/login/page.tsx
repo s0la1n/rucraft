@@ -26,7 +26,7 @@ export default function LoginPage() {
     const password = (fd.get("password") as string) ?? "";
     
     try {
-      // ВАЖНО: сначала получаем CSRF cookie
+      //сначала получаем CSRF cookie
       await fetch('http://localhost:8000/sanctum/csrf-cookie', {
         credentials: 'include'
       });

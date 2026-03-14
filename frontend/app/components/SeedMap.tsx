@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 "use client";
 
 import { useEffect, useRef, useState, type MouseEvent, type WheelEvent as ReactWheelEvent } from "react";
@@ -82,7 +81,7 @@ const VERSIONS: VersionOption[] = [
   { id: "bedrock_1_19", label: "Bedrock 1.19", platform: "bedrock" },
 ];
 
-// Простая детерминированная псевдослучайная функция на основе сида и координат
+//  преобразование координат и сида в числа
 function hashToUnit(seed: number, x: number, z: number): number {
   let n = x * 374761393 + z * 668265263 + seed * 1274126177;
   n = (n ^ (n >> 13)) * 1274126177;
@@ -90,7 +89,7 @@ function hashToUnit(seed: number, x: number, z: number): number {
   return (n & 0xffffffff) / 0xffffffff;
 }
 
-// Гладкий value-noise на основе hashToUnit с несколькими октавами
+// гладкий рельеф на основе hashToUnit 
 function layeredNoise(seed: number, x: number, z: number): number {
   const scale1 = 1 / 256;
   const scale2 = 1 / 96;
